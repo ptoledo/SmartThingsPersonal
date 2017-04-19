@@ -80,30 +80,31 @@ def initialize() {
   subscribe(sensorBanop, "motion", motionBanop)
   state.prev0 = 0;
   state.prev1 = 0;
-  state.presenceSwitch = [presenceSwitchEntrada,
-                          presenceSwitchLiving,
-	                      presenceSwitchCocina,
-	                      presenceSwitchPasillo,
-	                      presenceSwitchEstudio,
-	                      presenceSwitchBanoi,
-	                      presenceSwitchDormitorio,
-	                      presenceSwitchCloset,
-	                      presenceSwitchBanop,
-	                      presenceSwitchOutside]  
 }
 
 def motionEvent(presence){
+  def presenceSwitch = [presenceSwitchEntrada,
+                        presenceSwitchLiving,
+                        presenceSwitchCocina,
+	                    presenceSwitchPasillo,
+    	                presenceSwitchEstudio,
+	                    presenceSwitchBanoi,
+	                    presenceSwitchDormitorio,
+	                    presenceSwitchCloset,
+	                    presenceSwitchBanop,
+	                    presenceSwitchOutside]  
   if(presence != state.prev0 || presenceSwitchOutside.currentSwitch == "on") {
-  	log.debug("Changing presence for "+presence)
+  	log.debug("Changing presence to "+presence)
   	state.prev1 = state.prev0
   	state.prev0 = presence
-  	state.presenceSwitch.each{
+  	presenceSwitch.each{
+      
 	  if (it.displayName != state.prev0 && it.displayName != state.prev1 && it.currentSwitch == "on") {
-	    log.debug("Presencia OFF : "+it.displayName)
+	    log.debug("Changing presence to "+presence+" OFF : "+it.displayName)
 	    it.off()
 	  }
 	  if ((it.displayName == state.prev0 || it.displayName == state.prev1) && it.currentSwitch == "off") {
-	    log.debug("Presencia ON  : "+it.displayName)
+	    log.debug("Changing presence to "+presence+" ON  : "+it.displayName)
 	    it.on()
 	  }
   	}     
