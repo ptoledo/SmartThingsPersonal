@@ -47,8 +47,12 @@ preferences {
     input "presenceSwitchCloset", "capability.switch", title: "Pick your Closet switch", required: true    
     input "presenceSwitchBanop", "capability.switch", title: "Pick your Baño Principal switch", required: true
     input "presenceSwitchOutside", "capability.switch", title: "Pick your Outside switch", required: true
+  }
+  section("Shut-down triggering") {
     paragraph("Set the time to change to Outide")
     input "outsideDelay", "number", required: true, title: "Set outside delay time"
+    paragraph("Set the modes in wich this can be triggered")
+    input "outsideModes", "mode", title: "Select the allowed mode(s)", multiple: true
   }
 }
 
@@ -74,12 +78,7 @@ def initialize() {
   subscribe(sensorBanop, "motion", motionBanop)
   state.prev0 = 0;
   state.prev1 = 0;
-}
-
-
-def motionEvent(presence){
-  if(presence != state.prev0 || presenceSwitchOutside.currentSwitch == "on") {
-    def presenceSwitch = [presenceSwitchLiving,
+  state.presenceSwitch = [presenceSwitchLiving,
 	                      presenceSwitchCocina,
 	                      presenceSwitchPasillo,
 	                      presenceSwitchEstudio,
@@ -87,11 +86,15 @@ def motionEvent(presence){
 	                      presenceSwitchDormitorio,
 	                      presenceSwitchCloset,
 	                      presenceSwitchBanop,
-	                      presenceSwitchOutside]
-  	log.debug("pm: Changing presence for "+presence)
+	                      presenceSwitchOutside]  
+}
+
+def motionEvent(presence){
+  if(presence != state.prev0 || presenceSwitchOutside.currentSwitch == "on") {
+  	log.debug("Changing presence for "+presence)
   	state.prev1 = state.prev0
   	state.prev0 = presence
-  	presenceSwitch.each{
+  	state.presenceSwitch.each{
 	  if (it.displayName != state.prev0 && it.displayName != state.prev1 && it.currentSwitch == "on") {
 	    log.debug("Presencia OFF : "+it.displayName)
 	    it.off()
@@ -100,9 +103,9 @@ def motionEvent(presence){
 	    log.debug("Presencia ON  : "+it.displayName)
 	    it.on()
 	  }
-  	}
-  	runIn(outsideDelay, motionOutside)      
+  	}     
   }
+  runIn(outsideDelay, motionOutside)
 }
 
 def motionLiving(evt){
@@ -156,12 +159,6 @@ def motionBanop(evt) {
 def motionOutside(evt) {
   if (presenceSwitchLiving.currentSwitch == "on" || presenceSwitchCocina.currentSwitch == "on") {
     motionEvent("Presencia Outside")
-    /*log.debug("pm: Changing presence to Outside")
-    presenceSwitch.each {
-      if (it.currentSwitch == "on") {
-        it.off()
-      }
-    }*/
   } else {
     runIn(outsideDelay, motionOutside)
   }
