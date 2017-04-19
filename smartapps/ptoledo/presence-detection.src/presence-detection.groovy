@@ -17,16 +17,16 @@ definition(
   name: "Presence Detection",
   namespace: "ptoledo",
   author: "Pedro Toledo",
-  description: "To keep a record about the person presence location through motion sensors",
+  description: "An app to identify the active zones at the apartment considering a set of motion sensor.",
   category: "SmartThings Labs",
   iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
   iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
   iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
 
-
 preferences {
   section("Set the sensors") {
     paragraph("Select your motion sensors for each area")
+    input "sensorEntrada", "capability.motionSensor", title: "Pick your Entrada sensors", required: false, multiple: true
     input "sensorLiving", "capability.motionSensor", title: "Pick your Living sensors", required: false, multiple: true
     input "sensorCocina", "capability.motionSensor", title: "Pick your Cocina sensors", required: false, multiple: true
     input "sensorPasillo", "capability.motionSensor", title: "Pick your Pasillo sensors", required: false, multiple: true
@@ -38,6 +38,7 @@ preferences {
   }
   section("Set the information flag switches") {
     paragraph("Select your switches to communicate presence")
+    input "presenceSwitchEntrada", "capability.switch", title: "Pick your Entrada switch", required: true
     input "presenceSwitchLiving", "capability.switch", title: "Pick your Living switch", required: true
     input "presenceSwitchCocina", "capability.switch", title: "Pick your Cocina switch", required: true
     input "presenceSwitchPasillo", "capability.switch", title: "Pick your Pasillo switch", required: true
@@ -52,7 +53,7 @@ preferences {
     paragraph("Set the time to change to Outide")
     input "outsideDelay", "number", required: true, title: "Set outside delay time"
     paragraph("Set the modes in wich this can be triggered")
-    input "outsideModes", "mode", title: "Select the allowed mode(s)", multiple: true
+    input "outsideModes", "mode", title: "Select the allowed mode(s)", multiple: true, required: false
   }
 }
 
@@ -68,6 +69,7 @@ def updated() {
 }
 
 def initialize() {
+  subscribe(sensorEntrada, "motion", motionEntrada)
   subscribe(sensorLiving, "motion", motionLiving)
   subscribe(sensorCocina, "motion", motionCocina)
   subscribe(sensorPasillo, "motion", motionPasillo)
@@ -78,7 +80,8 @@ def initialize() {
   subscribe(sensorBanop, "motion", motionBanop)
   state.prev0 = 0;
   state.prev1 = 0;
-  state.presenceSwitch = [presenceSwitchLiving,
+  state.presenceSwitch = [presenceSwitchEntrada,
+                          presenceSwitchLiving,
 	                      presenceSwitchCocina,
 	                      presenceSwitchPasillo,
 	                      presenceSwitchEstudio,
@@ -106,6 +109,12 @@ def motionEvent(presence){
   	}     
   }
   runIn(outsideDelay, motionOutside)
+}
+
+def motionEntrada(evt){
+  if(evt.value == "active") {
+    motionEvent("Presencia Entrada")
+  }
 }
 
 def motionLiving(evt){
@@ -157,7 +166,7 @@ def motionBanop(evt) {
 }
 
 def motionOutside(evt) {
-  if (presenceSwitchLiving.currentSwitch == "on" || presenceSwitchCocina.currentSwitch == "on") {
+  if (presenceSwitchEntrada.currentSwitch == "on") {
     motionEvent("Presencia Outside")
   } else {
     runIn(outsideDelay, motionOutside)
