@@ -26,7 +26,6 @@ definition(
     appSetting "accessToken"
 }
 
-
 preferences {
   page(name: "Configure the areas", install: true) {
     section("Set the information flag switches") {
@@ -39,7 +38,6 @@ preferences {
       input "presenceSwitchDormitorio", "capability.switch", title: "Pick your Dormitorio switch"
       input "presenceSwitchCloset", "capability.switch", title: "Pick your Closet switch"
       input "presenceSwitchBanop", "capability.switch", title: "Pick your Baño Principal switch"
-      input "presenceSwitchOutside", "capability.switch", title: "Pick your Outside switch"
     }
     section("Set the light switch for each room"){
       input "lightsLiving", "capability.switch", title: "Pick your Living lights", multiple: true, required: false
@@ -50,7 +48,7 @@ preferences {
       input "lightsDormitorio", "capability.switch", title: "Pick your Dormitorio lights", multiple: true, required: false
       input "lightsCloset", "capability.switch", title: "Pick your Closet lights", multiple: true, required: false
       input "lightsBanop", "capability.switch", title: "Pick your Baño Principal lights", multiple: true, required: false
-      input "lightsOutside", "capability.switch", title: "Pick your Outside lights", multiple: true, required: false
+
     }
     section("Set the dimm light switch for each room"){
       input "lightsDimmMode", "mode", title: "Pick your mode for dimm activation", multiple: true, required: false
@@ -62,10 +60,11 @@ preferences {
       input "lightsDimmDormitorio", "capability.switch", title: "Pick your Dormitorio lights", multiple: true, required: false
       input "lightsDimmCloset", "capability.switch", title: "Pick your Closet lights", multiple: true, required: false
       input "lightsDimmBanop", "capability.switch", title: "Pick your Baño Principal lights", multiple: true, required: false
-      input "lightsDimmOutside", "capability.switch", title: "Pick your Outside lights", multiple: true, required: false
     }
     section("Configuration"){
       input "offDelay", "number", title: "Set the delay to turn off a light at exiting the zone", required: true
+      input "presenceSwitchOutside", "capability.switch", title: "Pick your Outside switch"
+      input "lightsOutside", "capability.switch", title: "Pick your Outside event lights", multiple: true, required: false
     }
   }
 }
