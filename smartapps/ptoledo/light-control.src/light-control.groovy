@@ -14,16 +14,18 @@
  *
  */
 definition(
-    name: "Light Control",
-    namespace: "ptoledo",
-    author: "Pedro Toledo",
+    name:        "Light Control",
+    namespace:   "ptoledo",
+    author:      "Pedro Toledo",
     description: "To control the lights on/off according to presence detection",
-    category: "SmartThings Labs",
-    iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
-    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
-    iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
-    oauth: true) {
-    appSetting "accessToken"
+    category:    "SmartThings Labs",
+    iconUrl:     "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
+    iconX2Url:   "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
+    iconX3Url:   "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
+    oauth:        true
+)
+{
+    appSetting   "accessToken"
 }
 
 preferences {
@@ -49,17 +51,6 @@ preferences {
       input "lightsCloset", "capability.switch", title: "Pick your Closet lights", multiple: true, required: false
       input "lightsBanop", "capability.switch", title: "Pick your Baño Principal lights", multiple: true, required: false
 
-    }
-    section("Set the dimm light switch for each room"){
-      input "lightsDimmMode", "mode", title: "Pick your mode for dimm activation", multiple: true, required: false
-      input "lightsDimmLiving", "capability.switch", title: "Pick your Living lights", multiple: true, required: false
-      input "lightsDimmCocina", "capability.switch", title: "Pick your Cocina lights", multiple: true, required: false
-      input "lightsDimmPasillo", "capability.switch", title: "Pick your Pasillo lights", multiple: true, required: false
-      input "lightsDimmEstudio", "capability.switch", title: "Pick your Estudio lights", multiple: true, required: false
-      input "lightsDimmBanoi", "capability.switch", title: "Pick your Baño Invitado lights", multiple: true, required: false
-      input "lightsDimmDormitorio", "capability.switch", title: "Pick your Dormitorio lights", multiple: true, required: false
-      input "lightsDimmCloset", "capability.switch", title: "Pick your Closet lights", multiple: true, required: false
-      input "lightsDimmBanop", "capability.switch", title: "Pick your Baño Principal lights", multiple: true, required: false
     }
     section("Configuration"){
       input "offDelay", "number", title: "Set the delay to turn off a light at exiting the zone", required: true
@@ -94,13 +85,7 @@ def initialize() {
 
 def lightsLivingHandler(evt) {
   if(evt.value == "on") {
-    if (location.mode != lightsDimmMode) {
-      lightsLiving.on()
-      lightsDimmLiving.off()
-    } else {
-      lightsLiving.off()
-      lightsDimmLiving.on()
-    }
+    lightsLiving.on()
   } else {
     runIn(offDelay, offLiving)
   }
@@ -109,7 +94,6 @@ def lightsLivingHandler(evt) {
 def offLiving() {
   if(presenceSwitchLiving.currentswitch == "off" && presenceSwitchCocina.currentswitch == "off" && presenceSwitchEntrada.currentswitch == "off"){
     lightsLiving.off()
-    lightsDimmLiving.off()
   } else {
     runIn(offDelay, offLiving)
   }
@@ -117,13 +101,7 @@ def offLiving() {
 
 def lightsCocinaHandler(evt) {
   if(evt.value == "on") {
-    if (location.mode != lightsDimmMode) {
-      lightsCocina.on()
-      lightsDimmCocina.off()
-    } else {
-      lightsCocina.off()
-      lightsDimmCocina.on()
-    }
+    lightsCocina.on()
   } else {
     runIn(offDelay, offCocina)
   }
@@ -132,19 +110,12 @@ def lightsCocinaHandler(evt) {
 def offCocina() {
   if(presenceSwitchCocina.currentswitch == "off"){
     lightsCocina.off()
-    lightsDimmCocina.off()    
   }
 }
 
 def lightsPasilloHandler(evt) {
   if(evt.value == "on") {
-    if (location.mode != lightsDimmMode) {
-      lightsPasillo.on()
-      lightsDimmPasillo.off()
-    } else {
-      lightsPasillo.off()
-      lightsDimmPasillo.on()
-    }
+    lightsPasillo.on()
   } else {
     runIn(offDelay, offPasillo)
   }
@@ -153,7 +124,6 @@ def lightsPasilloHandler(evt) {
 def offPasillo() {
   if(presenceSwitchPasillo.currentswitch == "off"){
     lightsPasillo.off()
-    lightsDimmPasillo.off()
   } else {
     runIn(offDelay, offPasillo)
   }
@@ -161,13 +131,7 @@ def offPasillo() {
 
 def lightsEstudioHandler(evt) {
   if(evt.value == "on") {
-    if (location.mode != lightsDimmMode) {
-      lightsEstudio.on()
-      lightsDimmEstudio.off()
-    } else {
-      lightsEstudio.off()
-      lightsDimmEstudio.on()
-    }
+    lightsEstudio.on()
   } else {
     runIn(offDelay, offEstudio)
   }
@@ -176,19 +140,12 @@ def lightsEstudioHandler(evt) {
 def offEstudio() {
   if(presenceSwitchEstudio.currentswitch == "off"){
     lightsEstudio.off()
-    lightsDimmEstudio.off()
   }
 }
 
 def lightsBanoiHandler(evt) {
   if(evt.value == "on") {
-    if (location.mode != lightsDimmMode) {
-      lightsBanoi.on()
-      lightsDimmBanoi.off()
-    } else {
-      lightsBanoi.off()
-      lightsDimmBanoi.on()
-    }
+    lightsBanoi.on()
   } else {
     runIn(offDelay, offBanoi)
   }
@@ -197,19 +154,12 @@ def lightsBanoiHandler(evt) {
 def offBanoi() {
   if(presenceSwitchBanoi.currentswitch == "off"){
     lightsBanoi.off()
-    lightsDimmBanoi.off()
   }
 }
 
 def lightsDormitorioHandler(evt) {
   if(evt.value == "on") {
-    if (location.mode != lightsDimmMode) {
-      lightsDormitorio.on()
-      lightsDimmDormitorio.off()
-    } else {
-      lightsDormitorio.off()
-      lightsDimmDormitorio.on()
-    }
+    lightsDormitorio.on()
   } else {
     runIn(offDelay, offDormitorio)
   }
@@ -218,7 +168,6 @@ def lightsDormitorioHandler(evt) {
 def offDormitorio() {
   if(presenceSwitchDormitorio.currentswitch == "off"){
     lightsDormitorio.off()
-    lightsDimmDormitorio.off()
   } else {
     runIn(offDelay, offDormitorio)
   }
@@ -226,13 +175,7 @@ def offDormitorio() {
 
 def lightsClosetHandler(evt) {
   if(evt.value == "on") {
-    if (location.mode != lightsDimmMode) {
-      lightsCloset.on()
-      lightsDimmCloset.off()
-    } else {
-      lightsCloset.off()
-      lightsDimmCloset.on()
-    }
+    lightsCloset.on()
   } else {
     runIn(offDelay, offCloset)
   }
@@ -240,7 +183,7 @@ def lightsClosetHandler(evt) {
 
 def offCloset() {
   if(presenceSwitchCloset.currentswitch == "off"){
-    lightsDimmCloset.off()
+    lightsCloset.off()
   } else {
     runIn(offDelay, offCloset)
   }
@@ -248,13 +191,7 @@ def offCloset() {
 
 def lightsBanopHandler(evt) {
   if(evt.value == "on") {
-    if (location.mode != lightsDimmMode) {
-      lightsBanop.on()
-      lightsDimmBanop.off()
-    } else {
-      lightsBanop.off()
-      lightsDimmBanop.on()
-    }
+    lightsBanop.on()
   } else {
     runIn(offDelay, offBanop)
   }
@@ -263,7 +200,6 @@ def lightsBanopHandler(evt) {
 def offBanop() {
   if(presenceSwitchBanop.currentswitch == "off"){
     lightsBanop.off()
-    lightsDimmBanop.off()
   } else {
     runIn(offDelay, offBanop)
   }

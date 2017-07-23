@@ -31,7 +31,6 @@ def Configuration() {
     dynamicPage(name: "Configuration", title: "", install: true, uninstall: true) {
         section {
         	input name: "theSwitch", title: "Select your controling switch", type: "capability.switch", required: true
-            input name: "theSwitchDimm", title: "Select your controling switch", type: "capability.switch", required: true
             input name: "theBulb", title: "Select your bulb", type: "capability.switch", required: true, submitOnChange: true, multiple: true
         }
         if(theBulb) {
@@ -41,28 +40,16 @@ def Configuration() {
                 	color = false;
                 }
             }
-			if(color) {
-                section("On") {
+            section("On configuration") {
+ 	            if(color) {
                     input "hue", "number", title: "hue", required: true, range: "0..100"
                     input "saturation", "number", title: "saturation", required: true, range: "0..100"
 		    		input "temperature", "number", title: "temperature. Set 0 for color", required: true, range: "2499..9000", defaultValue: "2499"
                     input "level", "number", title: "level", required: true, range: "0..100"                    
-                }
-                section("On (dimm)") {
-                    input "hueDimm", "number", title: "hue", required: true, range: "0..100"
-                    input "saturationDimm", "number", title: "saturation", required: true, range: "0..100"
-		    		input "temperatureDimm", "number", title: "temperature. Set 0 for color", required: true, range: "2499..9000", defaultValue: "2499"
-                    input "levelDimm", "number", title: "level", required: true, range: "0..100"                    
-                }
-   			} else {
-            	section("On") {
+                } else {
 		    		input "temperature", "number", title: "temperature", required: true, range: "2500..9000"
                     input "level", "number", title: "level", required: true, range: "0..100"
-                }
-            	section("On (dimm)") {
-		    		input "temperatureDimm", "number", title: "temperature", required: true, range: "2500..9000"
-                    input "levelDimm", "number", title: "level", required: true, range: "0..100"
-                }                
+                }   
 		    }
    		}
         section() {
@@ -85,14 +72,13 @@ def updated() {
 
 def initialize() {
     subscribe(theSwitch, "switch", bulbHandler)
-    subscribe(theSwitchDimm, "switch", bulbHandler)
 }
 
 def bulbHandler(evt) {
 	if(evt.value == "on") {
        	onBulb();
     } else {
-        if(theSwitch.currentSwitch == "on" || theSwitchDimm.currentSwitch == "on"){
+        if(theSwitch.currentSwitch == "on"){
         	onBulb()
         } else {
         	offBulb()
@@ -101,73 +87,61 @@ def bulbHandler(evt) {
 }
 
 def onBulb() {
-    theBulb.each {
-		log.debug "on try "+it.displayName
-		def action = 0
-        if (it.currentSwitch != "on") {
-        	if(theSwitchDimm.currentSwitch == "on"){
-            	action = 1
-            }
-            if(theSwitch.currentSwitch == "on"){
-                action = 2
-            }
-        } else {
-        	if(theSwitchDimm.currentSwitch == "on" && theSwitch.currentSwitch != "on"){
-            	if(temperatureDimm == 2499 && (it.currentHue != hueDimm || it.currentSaturation != saturationDimm || it.currentLevel != levelDimm)) {
-            		action = 1
-                }
-                if(temperatureDimm != 2499 && (it.currentColorTemperature != temperatureDimm || it.currentLevel != levelDimm)) {
-            		action = 1
-                }
-            } else {
-            	if(temperature == 2499 && (it.currentHue != hue || it.currentSaturation != saturation || it.currentLevel != level)) {
-            		action = 2
-                }
-                if(temperature != 2499 && (it.currentColorTemperature != temperature || it.currentLevel != level)) {
-            		action = 2
-                }
-            }
-        }
-        switch(action){
+  def rerun = 0
+  theBulb.each {
+    log.debug it.displayName+" - ON"
+	def action = 0
+    if(theSwitch.currentSwitch == "on"){
+      if(temperature == 2499 && (it.currentSwitch != "on" || it.currentHue != hue || it.currentSaturation != saturation || it.currentLevel != level)) {
+        action = 1
+      }
+      if(temperature != 2499 && (it.currentSwitch != "on" || it.currentColorTemperature != temperature || it.currentLevel != level)) {
+      	action = 1
+      }
+    }
+    switch(action){
         	case 0:
-            	log.debug "on done "+it.displayName
-                break
-            case 1:
-                it.setLevel(levelDimm)            
-                if(temperatureDimm == 2499){
-                    it.setHue(hueDimm)
-                    it.setSaturation(saturationDimm)
-                } else {
-                    it.setColorTemperature(temperatureDimm)
+                if(it.currentSwitch == "on") {
+            	    log.debug it.displayName+" - ON done!"
+                    break
                 }
-                runIn(1, onBulb)
-                break
-            case 2:
+                log.debug it.displayName+" - ON unexpected termination, retrying"
+            case 1:
+                log.debug it.displayName+" - ON try!"
                 it.setLevel(level)
                 if(temperature == 2499){
+                    log.debug it.displayName+" - With current status: "+it.currentSwitch+" hue: "+it.currentHue+" saturation: "+it.currentSaturation+" level: "+it.currentLevel
                     it.setHue(hue)
                     it.setSaturation(saturation)
                 } else {
+                    log.debug it.displayName+" - With current status: "+it.currentSwitch+" temperature: "+it.currentColorTemperature+" level: "+it.currentLevel
                     it.setColorTemperature(temperature)
                 }
-                runIn(1, onBulb)
+                rerun = 1;
                 break
             default:
-            	log.debug "on done (error) "+it.displayName
+            	log.debug it.displayName+" - ON done! (error)"
                 break
         }
+    }
+    if(rerun){
+      runIn(4, onBulb)    
     }
 }
 
 def offBulb() {
-	log.debug "off try"
-    	theBulb.each {
+    def rerun = 0
+    theBulb.each {
 		if(it.currentswitch != "off"){
-	    	it.off()
-	        runIn(1,offBulb)
+            log.debug it.displayName+" - OFF try"
+            rerun = 1
+	    	it.off()    
 	    } else {
-	    	log.debug "off done "+it.displayName
+	    	log.debug it.displayName+" - OFF done!"
 	    }
+    }
+    if(rerun){
+        runIn(4, offBulb)
     }
 }
 
