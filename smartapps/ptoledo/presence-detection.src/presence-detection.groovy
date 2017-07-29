@@ -31,10 +31,12 @@ preferences {
     input "sensorCocina", "capability.motionSensor", title: "Pick your Cocina sensors", required: false, multiple: true
     input "sensorPasillo", "capability.motionSensor", title: "Pick your Pasillo sensors", required: false, multiple: true
 	input "sensorEstudio", "capability.motionSensor", title: "Pick your Estudio sensors", required: false, multiple: true
+    input "sensorComputador", "capability.switch", title: "Pick your Computador sensors", required: false, multiple: true
     input "sensorBanoi", "capability.motionSensor", title: "Pick your Baño Invitado sensors", required: false, multiple: true
     input "sensorDormitorio", "capability.motionSensor", title: "Pick your Dormitorio sensors", required: false, multiple: true
     input "sensorCloset", "capability.motionSensor", title: "Pick your Closet sensors", required: false, multiple: true
     input "sensorBanop", "capability.motionSensor", title: "Pick your Baño Principal sensors", required: false, multiple: true
+    input "sensorPersonas", "capability.presenceSensor", title: "Pick your Personas sensors", required: false, multiple: true
   }
   section("Set the information flag switches") {
     paragraph("Select your switches to communicate presence")
@@ -74,6 +76,7 @@ def initialize() {
   subscribe(sensorCocina, "motion", motionCocina)
   subscribe(sensorPasillo, "motion", motionPasillo)
   subscribe(sensorEstudio, "motion", motionEstudio)
+  subscribe(sensorComputador, "switch", motionEstudio)
   subscribe(sensorBanoi, "motion", motionBanoi)
   subscribe(sensorDormitorio, "motion", motionDormitorio)
   subscribe(sensorCloset, "motion", motionCloset)
@@ -98,7 +101,6 @@ def motionEvent(presence){
   	state.prev1 = state.prev0
   	state.prev0 = presence
   	presenceSwitch.each{
-      
 	  if (it.displayName != state.prev0 && it.displayName != state.prev1 && it.currentSwitch == "on") {
 	    log.debug("Changing presence to "+presence+" OFF : "+it.displayName)
 	    it.off()
@@ -137,7 +139,7 @@ def motionPasillo(evt) {
 }
 
 def motionEstudio(evt) {
-  if(evt.value == "active") {
+  if(evt.value == "active" || evt.value == "on") {
     motionEvent("Presencia Estudio")
   }
 }
@@ -167,7 +169,13 @@ def motionBanop(evt) {
 }
 
 def motionOutside(evt) {
-  if (presenceSwitchEntrada.currentSwitch == "on") {
+  def somebody = 0
+  sensorPersonas.each{
+    if(it.presence == "present"){
+      somebody += 1
+    }
+  }
+  if (presenceSwitchEntrada.currentSwitch == "on" && somebody == 0) {
     motionEvent("Presencia Outside")
   } else {
     runIn(outsideDelay, motionOutside)

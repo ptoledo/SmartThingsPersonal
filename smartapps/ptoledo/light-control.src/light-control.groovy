@@ -36,6 +36,7 @@ preferences {
       input "presenceSwitchCocina", "capability.switch", title: "Pick your Cocina switch"
       input "presenceSwitchPasillo", "capability.switch", title: "Pick your Pasillo switch"
       input "presenceSwitchEstudio", "capability.switch", title: "Pick your Estudio switch"
+      input "presenceSwitchComputador", "capability.switch", title: "Pick your Computador switch"
       input "presenceSwitchBanoi", "capability.switch", title: "Pick your Baño Invitado switch"
       input "presenceSwitchDormitorio", "capability.switch", title: "Pick your Dormitorio switch"
       input "presenceSwitchCloset", "capability.switch", title: "Pick your Closet switch"
@@ -138,8 +139,10 @@ def lightsEstudioHandler(evt) {
 }
 
 def offEstudio() {
-  if(presenceSwitchEstudio.currentswitch == "off"){
+  if(presenceSwitchEstudio.currentswitch == "off" && presenceSwitchComputador.currentswitch == "off"){
     lightsEstudio.off()
+  } else if (presenceSwitchComputador.currentswitch != "off"){
+    runIn(offDelay, offEstudio)
   }
 }
 
