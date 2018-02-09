@@ -17,8 +17,8 @@
 definition(
   name: "CentralLog - SmartApp",
   namespace: "ptoledo",
-  author: "Pedro Toledo",
-  description: "Central Movement Log monitoring App",
+  author: "Pedro Toledo Correa",
+  description: "Central Loging SmartApp for registering events",
   category: "SmartThings Labs",
   iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
   iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
