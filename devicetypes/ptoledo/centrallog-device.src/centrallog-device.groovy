@@ -50,7 +50,6 @@ metadata {
         attribute "hitRname", "string"
         attribute "hitSname", "string"
         attribute "hitTname", "string"
-        attribute "hitUname", "string"
         attribute "hit0type", "string"
         attribute "hit1type", "string"
         attribute "hit2type", "string"
@@ -81,7 +80,6 @@ metadata {
         attribute "hitRtype", "string"
         attribute "hitStype", "string"
         attribute "hitTtype", "string"
-        attribute "hitUtype", "string"
         attribute "hit0time", "number"
         attribute "hit1time", "number"
         attribute "hit2time", "number"
@@ -112,19 +110,30 @@ metadata {
         attribute "hitRtime", "number"
         attribute "hitStime", "number"
         attribute "hitTtime", "number"
-        attribute "hitUtime", "number"
+        attribute "addEvent", "string"
+        attribute "cleaning", "string"
         // Resets the state of the device to empty
         command "clear"
+        // Allows to store a new event
 		command "addEvent", ["string", "string"]
+        // Reporting events
+        // Reports the last ocurrence of an event from #1 of type #2 as timestamp
+        // Reports 0 if there is not
+        command "getLastEvent", ["string", "string"]
+        // Reports the position of the last ocurrence of an event from #1 of type #2 as timestamp
+        // among events of type #2
+        // Reports 0 if there is not
+        command "getLastEventPosition", ["string", "string"]
+        command "toWrapper"
 	}
 	tiles (scale: 2) {
         multiAttributeTile(name:"main", type:"generic", width:6, height:4) {
-			tileAttribute("device.updating", canChangeIcon: true, key: "PRIMARY_CONTROL") {
-                attributeState "ready"     , label: "", icon: "st.illuminance.illuminance.bright",   backgroundColor: "#00a0dc", action: "clear"
-                attributeState "refreshing", label: "", icon: "st.illuminance.illuminance.bright", backgroundColor: "#00dca0", action: "clear"
+			tileAttribute("device.cleaning", canChangeIcon: true, key: "PRIMARY_CONTROL") {
+                attributeState "ready"   , label: "", icon: "st.illuminance.illuminance.bright", backgroundColor: "#00a0dc", action: "toWrapper"
+                attributeState "cleaning", label: "", icon: "st.motion.motion.active",           backgroundColor: "#00dca0", action: "toWrapper" //Lothar check arrow
             }
-            tileAttribute ("device.updating", key: "SECONDARY_CONTROL") {
-				attributeState "device.updating", label:'${currentValue}'
+            tileAttribute ("device.cleaning", key: "SECONDARY_CONTROL") {
+				attributeState "device.cleaning", label:'${currentValue}'
 			}
 		}
         standardTile("hit0name", "device.hit0name", width: 3, height: 1) {
@@ -173,202 +182,354 @@ metadata {
 
 // Clears the current list stack
 def clear() {
-    sendEvent(name: "updating", value: "refreshing")
-    sendEvent(name: "hit0name", value: "")
-    sendEvent(name: "hit0type", value: "")
-    sendEvent(name: "hit0time", value: "")
-    sendEvent(name: "hit1name", value: "")
-    sendEvent(name: "hit1type", value: "")
-    sendEvent(name: "hit1time", value: "")
-    sendEvent(name: "hit2name", value: "")
-    sendEvent(name: "hit2type", value: "")
-    sendEvent(name: "hit2time", value: "")
-    sendEvent(name: "hit3name", value: "")
-    sendEvent(name: "hit3type", value: "")
-    sendEvent(name: "hit3time", value: "")
-    sendEvent(name: "hit4name", value: "")
-    sendEvent(name: "hit4type", value: "")
-    sendEvent(name: "hit4time", value: "")
-    sendEvent(name: "hit5name", value: "")
-    sendEvent(name: "hit5type", value: "")
-    sendEvent(name: "hit5time", value: "")
-    sendEvent(name: "hit6name", value: "")
-    sendEvent(name: "hit6type", value: "")
-    sendEvent(name: "hit6time", value: "")
-    sendEvent(name: "hit7name", value: "")
-    sendEvent(name: "hit7type", value: "")
-    sendEvent(name: "hit7time", value: "")
-    sendEvent(name: "hit8name", value: "")
-    sendEvent(name: "hit8type", value: "")
-    sendEvent(name: "hit8time", value: "")
-    sendEvent(name: "hit9name", value: "")
-    sendEvent(name: "hit9type", value: "")
-    sendEvent(name: "hit9time", value: "")
-    sendEvent(name: "hitAname", value: "")
-    sendEvent(name: "hitAtype", value: "")
-    sendEvent(name: "hitAtime", value: "")
-    sendEvent(name: "hitBname", value: "")
-    sendEvent(name: "hitBtype", value: "")
-    sendEvent(name: "hitBtime", value: "")
-    sendEvent(name: "hitCname", value: "")
-    sendEvent(name: "hitCtype", value: "")
-    sendEvent(name: "hitCtime", value: "")
-    sendEvent(name: "hitDname", value: "")
-    sendEvent(name: "hitDtype", value: "")
-    sendEvent(name: "hitDtime", value: "")
-    sendEvent(name: "hitEname", value: "")
-    sendEvent(name: "hitEtype", value: "")
-    sendEvent(name: "hitEtime", value: "")
-    sendEvent(name: "hitFname", value: "")
-    sendEvent(name: "hitFtype", value: "")
-    sendEvent(name: "hitFtime", value: "")
-    sendEvent(name: "hitGname", value: "")
-    sendEvent(name: "hitGtype", value: "")
-    sendEvent(name: "hitGtime", value: "")
-    sendEvent(name: "hitHname", value: "")
-    sendEvent(name: "hitHtype", value: "")
-    sendEvent(name: "hitHtime", value: "")
-    sendEvent(name: "hitIname", value: "")
-    sendEvent(name: "hitItype", value: "")
-    sendEvent(name: "hitItime", value: "")
-    sendEvent(name: "hitJname", value: "")
-    sendEvent(name: "hitJtype", value: "")
-    sendEvent(name: "hitJtime", value: "")
-    sendEvent(name: "hitKname", value: "")
-    sendEvent(name: "hitKtype", value: "")
-    sendEvent(name: "hitKtime", value: "")
-    sendEvent(name: "hitLname", value: "")
-    sendEvent(name: "hitLtype", value: "")
-    sendEvent(name: "hitLtime", value: "")
-    sendEvent(name: "hitMname", value: "")
-    sendEvent(name: "hitMtype", value: "")
-    sendEvent(name: "hitMtime", value: "")
-    sendEvent(name: "hitNname", value: "")
-    sendEvent(name: "hitNtype", value: "")
-    sendEvent(name: "hitNtime", value: "")
-    sendEvent(name: "hitOname", value: "")
-    sendEvent(name: "hitOtype", value: "")
-    sendEvent(name: "hitOtime", value: "")
-    sendEvent(name: "hitPname", value: "")
-    sendEvent(name: "hitPtype", value: "")
-    sendEvent(name: "hitPtime", value: "")
-    sendEvent(name: "hitQname", value: "")
-    sendEvent(name: "hitQtype", value: "")
-    sendEvent(name: "hitQtime", value: "")
-    sendEvent(name: "hitRname", value: "")
-    sendEvent(name: "hitRtype", value: "")
-    sendEvent(name: "hitRtime", value: "")
-    sendEvent(name: "hitSname", value: "")
-    sendEvent(name: "hitStype", value: "")
-    sendEvent(name: "hitStime", value: "")
-    sendEvent(name: "hitTname", value: "")
-    sendEvent(name: "hitTtype", value: "")
-    sendEvent(name: "hitTtime", value: "")
-    sendEvent(name: "hitUname", value: "")
-    sendEvent(name: "hitUtype", value: "")
-    sendEvent(name: "hitUtime", value: "")
-    sendEvent(name: "updating", value: "ready")
+    state.sem1 = 1
+    sendEvent(name: "cleaning", value: "cleaning")
+    sendEvent(name: "hit0name", value: "", displayed: false)
+    sendEvent(name: "hit0type", value: "", displayed: false)
+    sendEvent(name: "hit0time", value:  0, displayed: false)
+    sendEvent(name: "hit1name", value: "", displayed: false)
+    sendEvent(name: "hit1type", value: "", displayed: false)
+    sendEvent(name: "hit1time", value:  0, displayed: false)
+    sendEvent(name: "hit2name", value: "", displayed: false)
+    sendEvent(name: "hit2type", value: "", displayed: false)
+    sendEvent(name: "hit2time", value:  0, displayed: false)
+    sendEvent(name: "hit3name", value: "", displayed: false)
+    sendEvent(name: "hit3type", value: "", displayed: false)
+    sendEvent(name: "hit3time", value:  0, displayed: false)
+    sendEvent(name: "hit4name", value: "", displayed: false)
+    sendEvent(name: "hit4type", value: "", displayed: false)
+    sendEvent(name: "hit4time", value:  0, displayed: false)
+    sendEvent(name: "hit5name", value: "", displayed: false)
+    sendEvent(name: "hit5type", value: "", displayed: false)
+    sendEvent(name: "hit5time", value:  0, displayed: false)
+    sendEvent(name: "hit6name", value: "", displayed: false)
+    sendEvent(name: "hit6type", value: "", displayed: false)
+    sendEvent(name: "hit6time", value:  0, displayed: false)
+    sendEvent(name: "hit7name", value: "", displayed: false)
+    sendEvent(name: "hit7type", value: "", displayed: false)
+    sendEvent(name: "hit7time", value:  0, displayed: false)
+    sendEvent(name: "hit8name", value: "", displayed: false)
+    sendEvent(name: "hit8type", value: "", displayed: false)
+    sendEvent(name: "hit8time", value:  0, displayed: false)
+    sendEvent(name: "hit9name", value: "", displayed: false)
+    sendEvent(name: "hit9type", value: "", displayed: false)
+    sendEvent(name: "hit9time", value:  0, displayed: false)
+    sendEvent(name: "hitAname", value: "", displayed: false)
+    sendEvent(name: "hitAtype", value: "", displayed: false)
+    sendEvent(name: "hitAtime", value:  0, displayed: false)
+    sendEvent(name: "hitBname", value: "", displayed: false)
+    sendEvent(name: "hitBtype", value: "", displayed: false)
+    sendEvent(name: "hitBtime", value:  0, displayed: false)
+    sendEvent(name: "hitCname", value: "", displayed: false)
+    sendEvent(name: "hitCtype", value: "", displayed: false)
+    sendEvent(name: "hitCtime", value:  0, displayed: false)
+    sendEvent(name: "hitDname", value: "", displayed: false)
+    sendEvent(name: "hitDtype", value: "", displayed: false)
+    sendEvent(name: "hitDtime", value:  0, displayed: false)
+    sendEvent(name: "hitEname", value: "", displayed: false)
+    sendEvent(name: "hitEtype", value: "", displayed: false)
+    sendEvent(name: "hitEtime", value:  0, displayed: false)
+    sendEvent(name: "hitFname", value: "", displayed: false)
+    sendEvent(name: "hitFtype", value: "", displayed: false)
+    sendEvent(name: "hitFtime", value:  0, displayed: false)
+    sendEvent(name: "hitGname", value: "", displayed: false)
+    sendEvent(name: "hitGtype", value: "", displayed: false)
+    sendEvent(name: "hitGtime", value:  0, displayed: false)
+    sendEvent(name: "hitHname", value: "", displayed: false)
+    sendEvent(name: "hitHtype", value: "", displayed: false)
+    sendEvent(name: "hitHtime", value:  0, displayed: false)
+    sendEvent(name: "hitIname", value: "", displayed: false)
+    sendEvent(name: "hitItype", value: "", displayed: false)
+    sendEvent(name: "hitItime", value:  0, displayed: false)
+    sendEvent(name: "hitJname", value: "", displayed: false)
+    sendEvent(name: "hitJtype", value: "", displayed: false)
+    sendEvent(name: "hitJtime", value:  0, displayed: false)
+    sendEvent(name: "hitKname", value: "", displayed: false)
+    sendEvent(name: "hitKtype", value: "", displayed: false)
+    sendEvent(name: "hitKtime", value:  0, displayed: false)
+    sendEvent(name: "hitLname", value: "", displayed: false)
+    sendEvent(name: "hitLtype", value: "", displayed: false)
+    sendEvent(name: "hitLtime", value:  0, displayed: false)
+    sendEvent(name: "hitMname", value: "", displayed: false)
+    sendEvent(name: "hitMtype", value: "", displayed: false)
+    sendEvent(name: "hitMtime", value:  0, displayed: false)
+    sendEvent(name: "hitNname", value: "", displayed: false)
+    sendEvent(name: "hitNtype", value: "", displayed: false)
+    sendEvent(name: "hitNtime", value:  0, displayed: false)
+    sendEvent(name: "hitOname", value: "", displayed: false)
+    sendEvent(name: "hitOtype", value: "", displayed: false)
+    sendEvent(name: "hitOtime", value:  0, displayed: false)
+    sendEvent(name: "hitPname", value: "", displayed: false)
+    sendEvent(name: "hitPtype", value: "", displayed: false)
+    sendEvent(name: "hitPtime", value:  0, displayed: false)
+    sendEvent(name: "hitQname", value: "", displayed: false)
+    sendEvent(name: "hitQtype", value: "", displayed: false)
+    sendEvent(name: "hitQtime", value:  0, displayed: false)
+    sendEvent(name: "hitRname", value: "", displayed: false)
+    sendEvent(name: "hitRtype", value: "", displayed: false)
+    sendEvent(name: "hitRtime", value:  0, displayed: false)
+    sendEvent(name: "hitSname", value: "", displayed: false)
+    sendEvent(name: "hitStype", value: "", displayed: false)
+    sendEvent(name: "hitStime", value:  0, displayed: false)
+    sendEvent(name: "hitTname", value: "", displayed: false)
+    sendEvent(name: "hitTtype", value: "", displayed: false)
+    sendEvent(name: "hitTtime", value:  0, displayed: false)
+    sendEvent(name: "cleaning", value: "ready")
+    state.buff001 = null
+    state.sem1 = 0
 }
 
 // Adding event to the log
 def addEvent(theName, theType) {
-  sendEvent(name: "updating", value: "refreshing")
-  sendEvent(name: "hitUname", value: device.currentValue("hitTname"))
-  sendEvent(name: "hitTname", value: device.currentValue("hitSname"))
-  sendEvent(name: "hitSname", value: device.currentValue("hitRname"))
-  sendEvent(name: "hitRname", value: device.currentValue("hitQname"))
-  sendEvent(name: "hitQname", value: device.currentValue("hitPname"))
-  sendEvent(name: "hitPname", value: device.currentValue("hitOname"))
-  sendEvent(name: "hitOname", value: device.currentValue("hitNname"))
-  sendEvent(name: "hitNname", value: device.currentValue("hitMname"))
-  sendEvent(name: "hitMname", value: device.currentValue("hitLname"))
-  sendEvent(name: "hitLname", value: device.currentValue("hitKname"))
-  sendEvent(name: "hitKname", value: device.currentValue("hitJname"))
-  sendEvent(name: "hitJname", value: device.currentValue("hitIname"))
-  sendEvent(name: "hitIname", value: device.currentValue("hitHname"))
-  sendEvent(name: "hitHname", value: device.currentValue("hitGname"))
-  sendEvent(name: "hitGname", value: device.currentValue("hitFname"))
-  sendEvent(name: "hitFname", value: device.currentValue("hitEname"))
-  sendEvent(name: "hitEname", value: device.currentValue("hitDname"))
-  sendEvent(name: "hitDname", value: device.currentValue("hitCname"))
-  sendEvent(name: "hitCname", value: device.currentValue("hitBname"))
-  sendEvent(name: "hitBname", value: device.currentValue("hitAname"))
-  sendEvent(name: "hitAname", value: device.currentValue("hit9name"))
-  sendEvent(name: "hit9name", value: device.currentValue("hit8name"))
-  sendEvent(name: "hit8name", value: device.currentValue("hit7name"))
-  sendEvent(name: "hit7name", value: device.currentValue("hit6name"))
-  sendEvent(name: "hit6name", value: device.currentValue("hit5name"))
-  sendEvent(name: "hit5name", value: device.currentValue("hit4name"))
-  sendEvent(name: "hit4name", value: device.currentValue("hit3name"))
-  sendEvent(name: "hit3name", value: device.currentValue("hit2name"))
-  sendEvent(name: "hit2name", value: device.currentValue("hit1name"))
-  sendEvent(name: "hit1name", value: device.currentValue("hit0name"))
-  sendEvent(name: "hit0name", value: theName)
-  sendEvent(name: "hitUtype", value: device.currentValue("hitTtype"))
-  sendEvent(name: "hitTtype", value: device.currentValue("hitStype"))
-  sendEvent(name: "hitStype", value: device.currentValue("hitRtype"))
-  sendEvent(name: "hitRtype", value: device.currentValue("hitQtype"))
-  sendEvent(name: "hitQtype", value: device.currentValue("hitPtype"))
-  sendEvent(name: "hitPtype", value: device.currentValue("hitOtype"))
-  sendEvent(name: "hitOtype", value: device.currentValue("hitNtype"))
-  sendEvent(name: "hitNtype", value: device.currentValue("hitMtype"))
-  sendEvent(name: "hitMtype", value: device.currentValue("hitLtype"))
-  sendEvent(name: "hitLtype", value: device.currentValue("hitKtype"))
-  sendEvent(name: "hitKtype", value: device.currentValue("hitJtype"))
-  sendEvent(name: "hitJtype", value: device.currentValue("hitItype"))
-  sendEvent(name: "hitItype", value: device.currentValue("hitHtype"))
-  sendEvent(name: "hitHtype", value: device.currentValue("hitGtype"))
-  sendEvent(name: "hitGtype", value: device.currentValue("hitFtype"))
-  sendEvent(name: "hitFtype", value: device.currentValue("hitEtype"))
-  sendEvent(name: "hitEtype", value: device.currentValue("hitDtype"))
-  sendEvent(name: "hitDtype", value: device.currentValue("hitCtype"))
-  sendEvent(name: "hitCtype", value: device.currentValue("hitBtype"))
-  sendEvent(name: "hitBtype", value: device.currentValue("hitAtype"))
-  sendEvent(name: "hitAtype", value: device.currentValue("hit9type"))
-  sendEvent(name: "hit9type", value: device.currentValue("hit8type"))
-  sendEvent(name: "hit8type", value: device.currentValue("hit7type"))
-  sendEvent(name: "hit7type", value: device.currentValue("hit6type"))
-  sendEvent(name: "hit6type", value: device.currentValue("hit5type"))
-  sendEvent(name: "hit5type", value: device.currentValue("hit4type"))
-  sendEvent(name: "hit4type", value: device.currentValue("hit3type"))
-  sendEvent(name: "hit3type", value: device.currentValue("hit2type"))
-  sendEvent(name: "hit2type", value: device.currentValue("hit1type"))
-  sendEvent(name: "hit1type", value: device.currentValue("hit0type"))
-  sendEvent(name: "hit0type", value: theType)
-  sendEvent(name: "hitUtime", value: device.currentValue("hitTtime"))
-  sendEvent(name: "hitTtime", value: device.currentValue("hitStime"))
-  sendEvent(name: "hitStime", value: device.currentValue("hitRtime"))
-  sendEvent(name: "hitRtime", value: device.currentValue("hitQtime"))
-  sendEvent(name: "hitQtime", value: device.currentValue("hitPtime"))
-  sendEvent(name: "hitPtime", value: device.currentValue("hitOtime"))
-  sendEvent(name: "hitOtime", value: device.currentValue("hitNtime"))
-  sendEvent(name: "hitNtime", value: device.currentValue("hitMtime"))
-  sendEvent(name: "hitMtime", value: device.currentValue("hitLtime"))
-  sendEvent(name: "hitLtime", value: device.currentValue("hitKtime"))
-  sendEvent(name: "hitKtime", value: device.currentValue("hitJtime"))
-  sendEvent(name: "hitJtime", value: device.currentValue("hitItime"))
-  sendEvent(name: "hitItime", value: device.currentValue("hitHtime"))
-  sendEvent(name: "hitHtime", value: device.currentValue("hitGtime"))
-  sendEvent(name: "hitGtime", value: device.currentValue("hitFtime"))
-  sendEvent(name: "hitFtime", value: device.currentValue("hitEtime"))
-  sendEvent(name: "hitEtime", value: device.currentValue("hitDtime"))
-  sendEvent(name: "hitDtime", value: device.currentValue("hitCtime"))
-  sendEvent(name: "hitCtime", value: device.currentValue("hitBtime"))
-  sendEvent(name: "hitBtime", value: device.currentValue("hitAtime"))
-  sendEvent(name: "hitAtime", value: device.currentValue("hit9time"))
-  sendEvent(name: "hit9time", value: device.currentValue("hit8time"))
-  sendEvent(name: "hit8time", value: device.currentValue("hit7time"))
-  sendEvent(name: "hit7time", value: device.currentValue("hit6time"))
-  sendEvent(name: "hit6time", value: device.currentValue("hit5time"))
-  sendEvent(name: "hit5time", value: device.currentValue("hit4time"))
-  sendEvent(name: "hit4time", value: device.currentValue("hit3time"))
-  sendEvent(name: "hit3time", value: device.currentValue("hit2time"))
-  sendEvent(name: "hit2time", value: device.currentValue("hit1time"))
-  sendEvent(name: "hit1time", value: device.currentValue("hit0time"))
-  sendEvent(name: "hit0time", value: now())
-  sendEvent(name: "updating", value: "ready")
+  // Checking sempahote
+  if (state.sem1 == 1){
+    runIn(1, "addEvent", ["theName": theName, "theType": theType])
+    log.debug "semaphoreTaken"
+  } else {
+    // Taking semaphore
+    state.sem1 = 1
+    // Displacing data on the array
+    sendEvent(name: "hitTname", value: device.currentValue("hitSname"), displayed: false)
+    sendEvent(name: "hitSname", value: device.currentValue("hitRname"), displayed: false)
+    sendEvent(name: "hitRname", value: device.currentValue("hitQname"), displayed: false)
+    sendEvent(name: "hitQname", value: device.currentValue("hitPname"), displayed: false)
+    sendEvent(name: "hitPname", value: device.currentValue("hitOname"), displayed: false)
+    sendEvent(name: "hitOname", value: device.currentValue("hitNname"), displayed: false)
+    sendEvent(name: "hitNname", value: device.currentValue("hitMname"), displayed: false)
+    sendEvent(name: "hitMname", value: device.currentValue("hitLname"), displayed: false)
+    sendEvent(name: "hitLname", value: device.currentValue("hitKname"), displayed: false)
+    sendEvent(name: "hitKname", value: device.currentValue("hitJname"), displayed: false)
+    sendEvent(name: "hitJname", value: device.currentValue("hitIname"), displayed: false)
+    sendEvent(name: "hitIname", value: device.currentValue("hitHname"), displayed: false)
+    sendEvent(name: "hitHname", value: device.currentValue("hitGname"), displayed: false)
+    sendEvent(name: "hitGname", value: device.currentValue("hitFname"), displayed: false)
+    sendEvent(name: "hitFname", value: device.currentValue("hitEname"), displayed: false)
+    sendEvent(name: "hitEname", value: device.currentValue("hitDname"), displayed: false)
+    sendEvent(name: "hitDname", value: device.currentValue("hitCname"), displayed: false)
+    sendEvent(name: "hitCname", value: device.currentValue("hitBname"), displayed: false)
+    sendEvent(name: "hitBname", value: device.currentValue("hitAname"), displayed: false)
+    sendEvent(name: "hitAname", value: device.currentValue("hit9name"), displayed: false)
+    sendEvent(name: "hit9name", value: device.currentValue("hit8name"), displayed: false)
+    sendEvent(name: "hit8name", value: device.currentValue("hit7name"), displayed: false)
+    sendEvent(name: "hit7name", value: device.currentValue("hit6name"), displayed: false)
+    sendEvent(name: "hit6name", value: device.currentValue("hit5name"), displayed: false)
+    sendEvent(name: "hit5name", value: device.currentValue("hit4name"), displayed: false)
+    sendEvent(name: "hit4name", value: device.currentValue("hit3name"), displayed: false)
+    sendEvent(name: "hit3name", value: device.currentValue("hit2name"), displayed: false)
+    sendEvent(name: "hit2name", value: device.currentValue("hit1name"), displayed: false)
+    sendEvent(name: "hit1name", value: device.currentValue("hit0name"), displayed: false)
+    sendEvent(name: "hit0name", value: theName, displayed: false)
+    sendEvent(name: "hitTtype", value: device.currentValue("hitStype"), displayed: false)
+    sendEvent(name: "hitStype", value: device.currentValue("hitRtype"), displayed: false)
+    sendEvent(name: "hitRtype", value: device.currentValue("hitQtype"), displayed: false)
+    sendEvent(name: "hitQtype", value: device.currentValue("hitPtype"), displayed: false)
+    sendEvent(name: "hitPtype", value: device.currentValue("hitOtype"), displayed: false)
+    sendEvent(name: "hitOtype", value: device.currentValue("hitNtype"), displayed: false)
+    sendEvent(name: "hitNtype", value: device.currentValue("hitMtype"), displayed: false)
+    sendEvent(name: "hitMtype", value: device.currentValue("hitLtype"), displayed: false)
+    sendEvent(name: "hitLtype", value: device.currentValue("hitKtype"), displayed: false)
+    sendEvent(name: "hitKtype", value: device.currentValue("hitJtype"), displayed: false)
+    sendEvent(name: "hitJtype", value: device.currentValue("hitItype"), displayed: false)
+    sendEvent(name: "hitItype", value: device.currentValue("hitHtype"), displayed: false)
+    sendEvent(name: "hitHtype", value: device.currentValue("hitGtype"), displayed: false)
+    sendEvent(name: "hitGtype", value: device.currentValue("hitFtype"), displayed: false)
+    sendEvent(name: "hitFtype", value: device.currentValue("hitEtype"), displayed: false)
+    sendEvent(name: "hitEtype", value: device.currentValue("hitDtype"), displayed: false)
+    sendEvent(name: "hitDtype", value: device.currentValue("hitCtype"), displayed: false)
+    sendEvent(name: "hitCtype", value: device.currentValue("hitBtype"), displayed: false)
+    sendEvent(name: "hitBtype", value: device.currentValue("hitAtype"), displayed: false)
+    sendEvent(name: "hitAtype", value: device.currentValue("hit9type"), displayed: false)
+    sendEvent(name: "hit9type", value: device.currentValue("hit8type"), displayed: false)
+    sendEvent(name: "hit8type", value: device.currentValue("hit7type"), displayed: false)
+    sendEvent(name: "hit7type", value: device.currentValue("hit6type"), displayed: false)
+    sendEvent(name: "hit6type", value: device.currentValue("hit5type"), displayed: false)
+    sendEvent(name: "hit5type", value: device.currentValue("hit4type"), displayed: false)
+    sendEvent(name: "hit4type", value: device.currentValue("hit3type"), displayed: false)
+    sendEvent(name: "hit3type", value: device.currentValue("hit2type"), displayed: false)
+    sendEvent(name: "hit2type", value: device.currentValue("hit1type"), displayed: false)
+    sendEvent(name: "hit1type", value: device.currentValue("hit0type"), displayed: false)
+    sendEvent(name: "hit0type", value: theType, displayed: false)
+    sendEvent(name: "hitTtime", value: device.currentValue("hitStime"), displayed: false)
+    sendEvent(name: "hitStime", value: device.currentValue("hitRtime"), displayed: false)
+    sendEvent(name: "hitRtime", value: device.currentValue("hitQtime"), displayed: false)
+    sendEvent(name: "hitQtime", value: device.currentValue("hitPtime"), displayed: false)
+    sendEvent(name: "hitPtime", value: device.currentValue("hitOtime"), displayed: false)
+    sendEvent(name: "hitOtime", value: device.currentValue("hitNtime"), displayed: false)
+    sendEvent(name: "hitNtime", value: device.currentValue("hitMtime"), displayed: false)
+    sendEvent(name: "hitMtime", value: device.currentValue("hitLtime"), displayed: false)
+    sendEvent(name: "hitLtime", value: device.currentValue("hitKtime"), displayed: false)
+    sendEvent(name: "hitKtime", value: device.currentValue("hitJtime"), displayed: false)
+    sendEvent(name: "hitJtime", value: device.currentValue("hitItime"), displayed: false)
+    sendEvent(name: "hitItime", value: device.currentValue("hitHtime"), displayed: false)
+    sendEvent(name: "hitHtime", value: device.currentValue("hitGtime"), displayed: false)
+    sendEvent(name: "hitGtime", value: device.currentValue("hitFtime"), displayed: false)
+    sendEvent(name: "hitFtime", value: device.currentValue("hitEtime"), displayed: false)
+    sendEvent(name: "hitEtime", value: device.currentValue("hitDtime"), displayed: false)
+    sendEvent(name: "hitDtime", value: device.currentValue("hitCtime"), displayed: false)
+    sendEvent(name: "hitCtime", value: device.currentValue("hitBtime"), displayed: false)
+    sendEvent(name: "hitBtime", value: device.currentValue("hitAtime"), displayed: false)
+    sendEvent(name: "hitAtime", value: device.currentValue("hit9time"), displayed: false)
+    sendEvent(name: "hit9time", value: device.currentValue("hit8time"), displayed: false)
+    sendEvent(name: "hit8time", value: device.currentValue("hit7time"), displayed: false)
+    sendEvent(name: "hit7time", value: device.currentValue("hit6time"), displayed: false)
+    sendEvent(name: "hit6time", value: device.currentValue("hit5time"), displayed: false)
+    sendEvent(name: "hit5time", value: device.currentValue("hit4time"), displayed: false)
+    sendEvent(name: "hit4time", value: device.currentValue("hit3time"), displayed: false)
+    sendEvent(name: "hit3time", value: device.currentValue("hit2time"), displayed: false)
+    sendEvent(name: "hit2time", value: device.currentValue("hit1time"), displayed: false)
+    sendEvent(name: "hit1time", value: device.currentValue("hit0time"), displayed: false)
+    sendEvent(name: "hit0time", value: now(), displayed: false)
+    // Clearing getLastEventPosition buffer
+    if(state.buff001 != null){
+      if(state.buff001[theType] != null){
+        state.buff001[theType] = null
+      }
+    }
+    // Reporting
+    sendEvent(name: "addEvent", value: "(${theName}, ${theType}) at ${now()}")
+    log.debug "CentralLog.addEvent${device.currentValue("addEvent")}"
+    // Freeing semaphore
+    state.sem1 = 0
+  }
 }
 
+def getId(i){
+ if(i<0 || i>29){
+    return "ERROR"
+  }
+  i+=48
+  i+=(i>57)?7:0
+  return (char) i
+}
+
+def getName(id){
+  if(getId(id) == "ERROR"){
+    return "ERROR"
+  }
+  return device.currentValue("hit${getId(id)}name")
+}
+
+def getType(id){
+  if(getId(id) == "ERROR"){
+    return "ERROR"
+  }
+  return device.currentValue("hit${getId(id)}type")
+}
+
+def getTime(id){
+  if(getId(id) == "ERROR"){
+    return "ERROR"
+  }
+  return device.currentValue("hit${getId(id)}time")
+}
+
+// Reporting events
+// Reports the last ocurrence of an event from #1 of type #2 as timestamp
+// Reports 0 if there is not
+def getLastEvent(theName, theType){
+  def buffer = "Looking for name: ${theName} with type ${theType}\n"
+  for(int i = 0; i<30; i++){
+    if(getName(i) == theName && getType(i) == theType){
+      return getTime(i)
+    }
+  }
+  return 0;
+}
+
+def toWrapper(){
+  //clear()
+  getLastEventPosition("04e91058-f833-4bd8-8598-0017e670d511", "active")
+  //log.debug getLastEventPosition("2e81bdc0-1799-4a59-b5c1-ec3bdd2aeae5", "open")
+}
+
+// Reports the position of the last ocurrence of an event from #1 of type #2 as timestamp
+// among events of type #2
+// Reports 0 if there is not
+def getLastEventPosition(theName, theType){
+  if(state.buff001 == null || state.buff001[theType] == null){
+    // Checking sempahore
+    while (state.sem1 == 1){
+      log.debug "semaphoreTaken"
+    }
+    // Taking semaphore
+    state.sem1 = 1
+    // Storing data
+    def list = [:]
+    int counter = 0;
+    for(int i=0; i<30; i++){
+      if(getType(i) == theType){
+        list[counter] = [:]
+        list[counter].name = getName(i)
+        list[counter].time = getTime(i)
+        counter++
+      }
+    }
+    // Freeing semaphore
+    state.sem1 = 0
+    // Processing
+    int t = counter
+    for(; counter<30; counter++){
+      list[counter] = null;
+    }
+    for(int i=0; i<t; i++){
+      if(list.get(i) == null){
+        continue
+      }
+      for(int j=i+1; j<t; j++){
+        if(list[j] == null){
+          continue
+        }
+        if(list[i].name == list[j].name){
+          list[j] = null
+        }
+      }
+      for(int j=0; j<t; j++){
+        if(list[j] != null){
+          continue
+        }
+        int k = j+1
+        while(list[k] == null && k<t){
+          k++
+        }
+        if(k>=t || list[k] == null){
+          break
+        }
+        list[j] = list[k]
+        list[k] = null
+      }
+    }
+    // Reporting
+    if(state.buff001 == null){
+      state.buff001 = [:]
+    }
+    state.parser = list
+    state.buff001[theType] = state.parser
+  } else {
+    log.debug "From buffer"
+  }
+  // Returning result
+  def buffer = "\nLooking for name: ${theName} with type ${theType}"
+  int toReturn = -1;
+  for(int i=0; (i<30 && toReturn<0); i++){
+    if(state.buff001[theType]["${i}"] == null){
+      i = 30
+      continue
+    }
+    if(state.buff001[theType]["${i}"].name == theName){
+      toReturn = i
+    }
+  }
+  for(int i=0; i<30; i++){
+    if(state.buff001[theType]["${i}"] == null){
+      break
+    }
+    buffer=buffer+"\n"+"${i} - ${state.buff001[theType]["${i}"].name} - ${state.buff001[theType]["${i}"].time}"
+  }
+  buffer=buffer+"\nEvent located at position ${toReturn}"
+  log.debug buffer
+  return toReturn
+}
+       
 // Parse events into attributes
 def parse(String description) {
 }
