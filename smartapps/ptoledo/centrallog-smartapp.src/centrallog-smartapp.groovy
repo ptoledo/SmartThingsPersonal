@@ -30,7 +30,7 @@ preferences {
     input "sensorDoor",   "capability.contactSensor", title: "Pick your contact sensors", required: false, multiple: true
   }
   section("Set the logger") {
-    input "logger", "capability.Refresh", title: "Pick your logger", required: true, multiple: false
+    input "logger", "capability.notification", title: "Pick your logger", required: true, multiple: false
   }
 }
 

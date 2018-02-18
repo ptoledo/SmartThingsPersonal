@@ -26,28 +26,44 @@ definition(
 
 preferences {
   section("Set the \"CentralLog - Device\"") {
-    input "presenceSwitchLiving", "capability.refresh", title: "Pick your CentralLog device", multiple: false, required: true
+    input "theCentralLog", "capability.notification", title: "Pick your CentralLog device", multiple: false, required: true
   }
   section("Set the \"CentralLog - BulbGroup Device\"") {
-    input "presenceSwitchLiving", "capability.switch", title: "Pick your BulbGroup device", multiple: true, required: true
+    input "theBulbGroupDevice", "capability.switch", title: "Pick your BulbGroup device", multiple: true, required: true
+  }
+  section("Set the Sensors to watch") {
+    input "theSensors", "capability.motionSensor", title: "Pick your Motion Sensor devices", multiple: true, required: false
   }
 }
 
 def installed() {
-	log.debug "Installed with settings: ${settings}"
-
-	initialize()
+  log.debug "Installed with settings: ${settings}"
+  initialize()
 }
 
 def updated() {
-	log.debug "Updated with settings: ${settings}"
-
-	unsubscribe()
-	initialize()
+  log.debug "Updated with settings: ${settings}"
+  unsubscribe()
+  initialize()
 }
 
 def initialize() {
-	// TODO: subscribe to attributes, devices, locations, etc.
+  subscribe(theCentralLog, "notification.deviceNotification", logHandler)
 }
 
-// TODO: implement event handlers
+def logHandler(evt) {
+  def last = 42
+  def buff = 0
+  theSensors.each{
+    theCentralLog.getLastEventPositionExternal(it.id, "active", "1")
+    buff = theCentralLog.currentValue("chanel1")
+    if(buff != -1 && buff<last){
+      last=buff
+    }
+  }
+  if(last<2){
+    theBulbGroupDevice.on()
+  } else {
+    theBulbGroupDevice.off()
+  }
+}
