@@ -18,7 +18,7 @@ metadata {
   definition (name: "CentralLog - Device", namespace: "ptoledo", author: "Pedro Toledo Correa") {
     // Capabilities
     // Creating the log capability to differentiate function
-    capability "Refresh"
+    capability "notification"
     
     // Attributes
     // Clear function running flag
@@ -38,7 +38,10 @@ metadata {
     attribute "hit1time", "string"
     attribute "hit2time", "string"
     attribute "hit3time", "string"
-
+    // Communicating with other apps
+    attribute "chanel1", "number"
+    attribute "chanel2", "number"
+    
     // Commands
     
     // Events Management
@@ -52,6 +55,10 @@ metadata {
     command "getLastEventTime", ["string", "string"]
     // Reports the position of the last ocurrence of an event from #1 of type #2 as timestamp among events of type #2
     command "getLastEventPosition", ["string", "string"]
+    
+    // Communication
+    // Communicates the getLastEventPosition from #1 of type #2 on chanel #3
+    command "getLastEventPositionExternal", ["string", "string", "string"]
     
     // Testing
     // Wrapper for testing propposes
@@ -176,11 +183,17 @@ def addEvent(theName, theType) {
       state.buff001[theType] = null
     }
     // Reporting
-    sendEvent(name: "addEvent", value: "(${state.events["0"].name}, ${state.events["0"].type}) at ${state.events["0"].time}")
-    log.debug "CentralLog.addEvent${device.currentValue("addEvent")}"
+    //sendEvent(name: "addEvent", value: "(${state.events["0"].name}, ${state.events["0"].type}) at ${state.events["0"].time}")
+    //log.debug "CentralLog.addEvent${device.currentValue("addEvent")}"
+    log.debug "CentralLog.addEvent(${state.events["0"].name}, ${state.events["0"].type}) at ${state.events["0"].time}"
+    state.dummy = state.dummy+1
+    sendEvent(name: "notification.deviceNotification", value: state.dummy)
     // Freeing mutex
     state.mutex001 = 0
   }
+}
+
+def deviceNotification(){
 }
 
 def printEvents(theEvents){
@@ -276,6 +289,10 @@ def getLastEventPosition(theName, theType){
     }
   }
   return -1;
+}
+
+def getLastEventPositionExternal(theName, theType, theChannel){
+  sendEvent(name: "chanel1", value: getLastEventPosition(theName, theType))
 }
 
 def toWrapper(){
