@@ -13,15 +13,17 @@
  *  for the specific language governing permissions and limitations under the License.
  *
  */
+
 definition(
   name: "CentralLog - BulbGroup SmartApp",
   namespace: "ptoledo",
   author: "Pedro Toledo",
   description: "This SmartApp allows the linking of a \"CentralLog - BulbGroup Device\" to a set of bulbs",
-  category: "",
+  category: "SmartThings Labs",
   iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
   iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
-  iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png")
+  iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png"
+)
 
 preferences {
   section("Set the \"CentralLog - BulbGroup Device\"") {
@@ -33,20 +35,16 @@ preferences {
 }
 
 def installed() {
-	log.debug "Installed with settings: ${settings}"
-
-	initialize()
+  log.debug "Installed with settings: ${settings}"
+  initialize()
 }
 
 def updated() {
-	log.debug "Updated with settings: ${settings}"
-
-	unsubscribe()
-	initialize()
+  log.debug "Updated with settings: ${settings}"
+  unsubscribe()
+  initialize()
 }
 
 def initialize() {
 	// TODO: subscribe to attributes, devices, locations, etc.
 }
-
-// TODO: implement event handlers
