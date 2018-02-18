@@ -39,31 +39,36 @@ metadata {
     attribute "hit2time", "string"
     attribute "hit3time", "string"
     // Communicating with other apps
-    attribute "chanel1", "number"
-    attribute "chanel2", "number"
+    attribute "channel0", "number"
+    attribute "channel1", "number"
+    attribute "channel2", "number"
+    attribute "channel3", "number"
+    attribute "channel4", "number"
+    attribute "channel5", "number"
+    attribute "channel6", "number"
+    attribute "channel7", "number"
+    attribute "channel8", "number"
+    attribute "channel9", "number"
     
     // Commands
-    
     // Events Management
     // Resets the state of the device to empty
     command "clear"
     // Stores a new event
     command "addEvent", ["string", "string"]
-    
     // Events analysis
     // Reports the last ocurrence of an event from #1 of type #2 as timestamp
     command "getLastEventTime", ["string", "string"]
     // Reports the position of the last ocurrence of an event from #1 of type #2 as timestamp among events of type #2
     command "getLastEventPosition", ["string", "string"]
-    
     // Communication
-    // Communicates the getLastEventPosition from #1 of type #2 on chanel #3
+    // Communicates the getLastEventPosition from #1 of type #2 on channel #3
     command "getLastEventPositionExternal", ["string", "string", "string"]
-    
     // Testing
     // Wrapper for testing propposes
     command "toWrapper"
   }
+  
   tiles (scale: 2) {
     multiAttributeTile(name:"main", type:"generic", width:6, height:4) {
       tileAttribute("device.cleaning", canChangeIcon: true, key: "PRIMARY_CONTROL") {
@@ -111,8 +116,7 @@ metadata {
       state "hit3time", label: '${currentValue}', action: "clear"
     }
   }
-  preferences {
-  }
+  
   simulator {
     // TODO: define status and reply messages here
   }
@@ -142,6 +146,7 @@ def clear() {
   state.events = [:]
   // Clearing calculation buffers
   state.buff001 = [:]
+  state.buff002 = [:]
   // Unstetting flag for tile display
   sendEvent(name: "cleaning", value: "ready")
   // Liberating mutex
@@ -179,15 +184,16 @@ def addEvent(theName, theType) {
       }
     }
     // Clearing getLastEventPosition buffer
+    // getEventsList
     if(state.buff001 != null){
       state.buff001[theType] = null
     }
+    // getEventsList
+    if(state.buff002 != null){
+      state.buff002[theType] = null
+    }
     // Reporting
-    //sendEvent(name: "addEvent", value: "(${state.events["0"].name}, ${state.events["0"].type}) at ${state.events["0"].time}")
-    //log.debug "CentralLog.addEvent${device.currentValue("addEvent")}"
-    log.debug "CentralLog.addEvent(${state.events["0"].name}, ${state.events["0"].type}) at ${state.events["0"].time}"
-    state.dummy = state.dummy+1
-    sendEvent(name: "notification.deviceNotification", value: state.dummy)
+    sendEvent(name: "notification.deviceNotification", value: "CentralLog.addEvent(${state.events["0"].name}, ${state.events["0"].type}) at ${state.events["0"].time}")
     // Freeing mutex
     state.mutex001 = 0
   }
@@ -244,28 +250,32 @@ def mapUnique(theMap, theKey){
 def getEventsList(theType){
   // Checking mutex
   if (state.mutex001 == 1){
-    log.debug "mutex001 is taken"
+    runIn(1, "getEventsList", ["theType": theType])
+    log.debug "mutex001 is taken, reruning in 1[s]"
   } else {
-    // Taking mutex
-    state.mutex001 = 1
-    // Getting info
-    def theSource = state.events
-    // Freeing the mutex
-    state.mutex001 = 0
-    // Process
-    def theReturn = [:]
-    int counter = 0
-    for(int i=0;i<42;i++){
-      if(theSource["${i}"] == null){
-        i=42
-        continue
+    if(!(state.buff001 != null && state.buff001[theType] != null)){
+      // Taking mutex
+      state.mutex001 = 1
+      // Getting info
+      def theSource = state.events
+      // Freeing the mutex
+      state.mutex001 = 0
+      // Process
+      def theReturn = [:]
+      int counter = 0
+      for(int i=0;i<42;i++){
+        if(theSource["${i}"] == null){
+          i=42
+          continue
+        }
+        if(theSource["${i}"].type == theType){
+          theReturn["${counter++}"] = theSource["${i}"]
+        }
       }
-      if(theSource["${i}"].type == theType){
-        theReturn["${counter++}"] = theSource["${i}"]
-      }
+      // Reporting
+      state.buff001[theType] = theReturn
     }
-    // Reporting
-    return theReturn
+    return state.buff001[theType]
   }
 }
 
@@ -282,7 +292,10 @@ def getLastEventTime(theName, theType){
 
 // Reports the last position of an event from #1 of type #2
 def getLastEventPosition(theName, theType){
-  def events = mapUnique(getEventsList(theType), "name")
+  if(!(state.buff002 != null && state.buff002[theType] != null)){
+    state.buff002[theType] = mapUnique(getEventsList(theType), "name")
+  }
+  def events = state.buff002[theType]
   for(int i=0; i<events.size(); i++){
     if(events["${i}"].name == theName){
       return i
@@ -292,10 +305,7 @@ def getLastEventPosition(theName, theType){
 }
 
 def getLastEventPositionExternal(theName, theType, theChannel){
-  sendEvent(name: "chanel1", value: getLastEventPosition(theName, theType))
-}
-
-def toWrapper(){
+  sendEvent(name: "channel${theChannel}", value: getLastEventPosition(theName, theType))
 }
 
 // Parse events into attributes
