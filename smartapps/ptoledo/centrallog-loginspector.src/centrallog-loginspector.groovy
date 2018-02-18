@@ -34,6 +34,9 @@ preferences {
   section("Set the Sensors to watch") {
     input "theSensors", "capability.motionSensor", title: "Pick your Motion Sensor devices", multiple: true, required: false
   }
+  section("Set the communication channel"){
+    input "theChannel", "number", title: "Set your channel for communication with the CentralLog", range: "0..9"
+  }
 }
 
 def installed() {
@@ -55,15 +58,15 @@ def logHandler(evt) {
   def last = 42
   def buff = 0
   theSensors.each{
-    theCentralLog.getLastEventPositionExternal(it.id, "active", "1")
-    buff = theCentralLog.currentValue("chanel1")
+    theCentralLog.getLastEventPositionExternal(it.id, "active", theChannel)
+    buff = theCentralLog.currentValue("channel${theChannel}")
     if(buff != -1 && buff<last){
       last=buff
     }
   }
   if(last<2){
-    theBulbGroupDevice.on()
+    theBulbGroupDevice.inspectorOn()
   } else {
-    theBulbGroupDevice.off()
+    theBulbGroupDevice.inspectorOff()
   }
 }
