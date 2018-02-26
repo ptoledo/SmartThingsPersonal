@@ -149,7 +149,6 @@ def mySwitch(data) {
 def mySetColor(data) {
   def bulb = getBulb(data.bulb)
   log.debug "try ${data} (${bulb.displayName}) Current: ${[hue: bulb.currentValue("hue"), saturation: bulb.currentValue("saturation")]}"
-  state.counter = state.counter+1
   if(bulb != null && [hue: bulb.currentValue("hue"), saturation: bulb.currentValue("saturation")] != data.value && bulb.currentValue("switch") == "on") {
     bulb.setColor(data.value)
     data.check = false
