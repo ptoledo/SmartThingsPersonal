@@ -194,7 +194,7 @@ def addEvent(theName, theType, theId) {
       state.buff002[theType] = null
     }
     // Reporting
-    sendEvent(name: "notification.deviceNotification", value: "CentralLog.addEvent(${state.events["0"].name}, ${state.events["0"].type}) at ${state.events["0"].time}")
+    sendEvent(name: "notification.deviceNotification", value: "CentralLog.addEvent(${state.events["0"].name}, ${state.events["0"].type}) at ${state.events["0"].time}", data: [type: state.events["0"].type])
     // Freeing mutex
     state.mutex001 = 0
   }
