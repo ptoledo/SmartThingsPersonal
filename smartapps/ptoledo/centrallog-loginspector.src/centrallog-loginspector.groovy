@@ -30,7 +30,7 @@ preferences {
     input "theCentralLog", "capability.notification", title: "Pick your CentralLog device", multiple: false, required: true
   }
   section("Set the \"CentralLog - BulbGroup Device\"") {
-    input "theBulbGroupDevice", "capability.switch", title: "Pick your BulbGroup device", multiple: true, required: true
+    input "theBulbGroupDevice", "capability.switch", title: "Pick your BulbGroup device", multiple: false, required: true
   }
   section("Set the Sensors to watch") {
     input "theSensors", "capability.motionSensor", title: "Pick your Motion Sensor devices", multiple: true, required: false
@@ -56,8 +56,31 @@ def initialize() {
 }
 
 def logHandler(evt) {
-  def last = 42
+  if(parseJson(evt.data).type == "active" && theBulbGroupDevice.currentSettingController == "Inspector"){
+    internalAction([theOff: false])
+  }
+}
+
+def internalAction(data){
+  def last = getLastFromDevice()
+  if (last<2) {
+    if(theBulbGroupDevice.currentSwitch != "on"){
+      theBulbGroupDevice.inspectorOn()
+    }
+  } else {
+    if(theBulbGroupDevice.currentSwitch != "off"){
+      if(data.theOff){
+        theBulbGroupDevice.inspectorOff()
+      }else{
+        runIn(120, internalAction, [data: [theOff: true]])
+      }
+    }
+  }
+}
+
+def getLastFromDevice() {
   def buff = 0
+  def last = 42
   theSensors.each{
     theCentralLog.getLastEventPositionExternal(it.id, "active", theChannel)
     buff = theCentralLog.currentValue("channel${theChannel}")
@@ -65,9 +88,5 @@ def logHandler(evt) {
       last=buff
     }
   }
-  if (last<2) {
-    theBulbGroupDevice.inspectorOn()
-  } else {
-    theBulbGroupDevice.inspectorOff()
-  }
+  return last
 }
