@@ -28,8 +28,9 @@ definition(
 
 preferences {
   section("Select your devices") {
-    input "bulbGroups", "capability.refresh", title: "Pick your BulbGroup devices", multiple: true, required: false
-    input "bulbs",      "capability.switch",  title: "Pick your Bulbs",             multiple: true, required: false
+    input "bulbGroups",  "capability.refresh", title: "Pick your BulbGroup devices",  multiple: true,  required: false
+    input "bulbs",       "capability.switch",  title: "Pick your Bulbs",              multiple: true,  required: false
+    input "clearSwitch", "capability.switch",  title: "Pick your Alexa clear switch", multiple: false, required: true
   }
 }
 
@@ -45,7 +46,17 @@ def updated() {
 }
 
 def initialize() {
+  state.check = []
+  state.mutex = 0
   subscribe(bulbGroups, "refresh", refreshBulbs)
+  subscribe(clearSwitch, "switch.on", clear)
+}
+
+def clear(evt){
+  bulbGroups.each{
+    it.clear()
+  }
+  clearSwitch.off()
 }
 
 def getBulb(id){
@@ -59,67 +70,115 @@ def getBulb(id){
   return runBulb
 }
 
+
 def refreshBulbs(evt) {
-  def runBulb = parseJson(evt.data).bulb
-  switch (parseJson(evt.data).name) {
-    case "switch":
-      mySwitch([bulb: runBulb, value: parseJson(evt.data).value])
-      break
-    case "color":
-      mySetColor([bulb: runBulb, value: parseJson(evt.data).value])
-      break
-    case "level":
-      mySetLevel([bulb: runBulb, value: parseJson(evt.data).value])
-      break
-    case "colorTemp":
-      mySetColorTemperature([bulb: runBulb, value: parseJson(evt.data).value])
-      break
-    default:
-      log.debug "Uncatched: ${parseJson(evt.data).name} with value: ${parseJson(evt.data).value}"
-      break
+  def data = [name:  parseJson(evt.data).name, 
+              bulb:  parseJson(evt.data).bulb, 
+              coun:  0,
+              check: false,
+              value: parseJson(evt.data).value]
+  action(data)
+}
+
+def action(data) {
+  if(data.coun > 20){
+    log.debug "Too many tries for: ${data}"
+  } else {
+    data.coun = data.coun+1
+    switch (data.name) {
+      case "switch":
+        mySwitch(data)
+        break
+      case "color":
+        mySetColor(data)
+        break
+      case "level":
+        mySetLevel(data)
+        break
+      case "colorTemp":
+        mySetColorTemperature(data)
+        break
+      default:
+        log.debug "Uncatched: ${data.name} for: ${data.bulb} with value: ${data.value}"
+        break
+    }
   }
+}
+
+def actionCheck() {
+  if(state.check != []){
+    if(state.mutex != 0){
+      runIn(1, actionCheck)
+    } else {
+      state.mutex = 1
+      action(state.check[0])
+      state.check.remove(0)
+      state.mutex = 0
+      runIn(0, actionCheck)      
+    }
+  }
+}
+
+def addToCheck(data){
+  data.check = true
+  while(state.mutex != 0) {
+    log.debug "mutex taken"
+  }
+  state.mutex = 1
+  state.check << data
+  state.mutex = 0
+  runIn(2, "actionCheck") 
 }
 
 def mySwitch(data) {
   def bulb = getBulb(data.bulb)
-  //log.debug "try ${data}"
+  log.debug "try ${data} (${bulb.displayName}) Current: ${bulb.currentValue("switch")}"
   if(bulb != null && bulb.currentValue("switch") != data.value) {
     if (data.value == "on") {
       bulb.on()
     } else {
       bulb.off()
     }
-    runIn(1, "mySwitch", [data: data]) 
+    data.check = false
+    runIn((data.coun/5)+2, "action", [data: data, overwrite: false])
+  } else if (data.check == false) {
+    addToCheck(data)
   }
 }
 
 def mySetColor(data) {
   def bulb = getBulb(data.bulb)
-  //log.debug "try ${data}"
-  if(bulb != null && bulb.currentValue("color") != data.value) {
+  log.debug "try ${data} (${bulb.displayName}) Current: ${[hue: bulb.currentValue("hue"), saturation: bulb.currentValue("saturation")]}"
+  state.counter = state.counter+1
+  if(bulb != null && [hue: bulb.currentValue("hue"), saturation: bulb.currentValue("saturation")] != data.value && bulb.currentValue("switch") == "on") {
     bulb.setColor(data.value)
-    runIn(1, "mySetColor", [data: data]) 
+    data.check = false
+    runIn((data.coun/5)+2, "action", [data: data, overwrite: false]) 
+  } else if (data.check == false && bulb.currentValue("switch") == "on") {
+    addToCheck(data)
   }
 }
 
 def mySetColorTemperature(data) {
   def bulb = getBulb(data.bulb)
-  //log.debug "try ${data}"
-  if(bulb != null && bulb.currentValue("colorTemperature") != data.value) {
+  log.debug "try ${data} (${bulb.displayName}) Current: ${bulb.currentValue("colorTemperature")}"
+  if(bulb != null && bulb.currentValue("colorTemperature") != data.value && bulb.currentValue("switch") == "on") {
     bulb.setColorTemperature(data.value)
-    runIn(1, "mySetColorTemperature", [data: data]) 
+    data.check = false
+    runIn((data.coun/5)+2, "action", [data: data, overwrite: false]) 
+  } else if (data.check == false && bulb.currentValue("switch") == "on") {
+    addToCheck(data)
   }
 }
 
 def mySetLevel(data) {
   def bulb = getBulb(data.bulb)
-  //log.debug "try ${data}"
-  if(bulb != null && bulb.currentValue("level") != data.value) {
+  log.debug "try ${data} (${bulb.displayName}) Current: ${bulb.currentValue("level")}"
+  if(bulb != null && bulb.currentValue("level") != data.value && bulb.currentValue("switch") == "on") {
     bulb.setLevel(data.value)
-    runIn(1, "mySetLevel", [data: data])
+    data.check = false
+    runIn((data.coun/5)+2, "action", [data: data, overwrite: false])
+  } else if (data.check == false && bulb.currentValue("switch") == "on") {
+    addToCheck(data)
   }
 }
-
-
-
-

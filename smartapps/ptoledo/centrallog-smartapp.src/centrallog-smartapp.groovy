@@ -52,5 +52,5 @@ def updated() {
 }
 
 def communicateEvent(evt) {
-  logger.addEvent(evt.deviceId, evt.value);
+  logger.addEvent(evt.deviceId, evt.value, evt.displayName);
 }
