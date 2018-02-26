@@ -30,14 +30,32 @@ metadata {
     attribute "hit1name", "string"
     attribute "hit2name", "string"
     attribute "hit3name", "string"
+    attribute "hit4name", "string"
+    attribute "hit5name", "string"
+    attribute "hit6name", "string"
+    attribute "hit7name", "string"
+    attribute "hit8name", "string"
+    attribute "hit9name", "string"
     attribute "hit0type", "string"
     attribute "hit1type", "string"
     attribute "hit2type", "string"
     attribute "hit3type", "string"
+    attribute "hit4type", "string"
+    attribute "hit5type", "string"
+    attribute "hit6type", "string"
+    attribute "hit7type", "string"
+    attribute "hit8type", "string"
+    attribute "hit9type", "string"
     attribute "hit0time", "string"
     attribute "hit1time", "string"
     attribute "hit2time", "string"
     attribute "hit3time", "string"
+    attribute "hit4time", "string"    
+    attribute "hit5time", "string"
+    attribute "hit6time", "string"
+    attribute "hit7time", "string"
+    attribute "hit8time", "string"
+    attribute "hit9time", "string"    
     // Communicating with other apps
     attribute "channel0", "number"
     attribute "channel1", "number"
@@ -86,7 +104,7 @@ metadata {
       state "hit0_type", label: '${currentValue}'
     }
     standardTile("hit0time", "device.hit0time", width: 2, height: 1) {
-      state "hit0time", label: '${currentValue}'
+      state "hit0time", label: '${currentValue}', action: "clear"
     }
     standardTile("hit1name", "device.hit1name", width: 3, height: 1) {
       state "hit1_name", label: '${currentValue}'
@@ -113,7 +131,61 @@ metadata {
       state "hit3type", label: '${currentValue}'
     }
     standardTile("hit3time", "device.hit3time", width: 2, height: 1) {
-      state "hit3time", label: '${currentValue}', action: "clear"
+      state "hit3time", label: '${currentValue}'
+    }
+    standardTile("hit4name", "device.hit4name", width: 3, height: 1) {
+      state "hit4name", label: '${currentValue}'
+    }
+    standardTile("hit4type", "device.hit4type", width: 1, height: 1) {
+      state "hit4type", label: '${currentValue}'
+    }
+    standardTile("hit4time", "device.hit4time", width: 2, height: 1) {
+      state "hit4time", label: '${currentValue}'
+    }
+    standardTile("hit5name", "device.hit5name", width: 3, height: 1) {
+      state "hit5name", label: '${currentValue}'
+    }
+    standardTile("hit5type", "device.hit5type", width: 1, height: 1) {
+      state "hit5type", label: '${currentValue}'
+    }
+    standardTile("hit5time", "device.hit5time", width: 2, height: 1) {
+      state "hit5time", label: '${currentValue}'
+    }
+    standardTile("hit6name", "device.hit6name", width: 3, height: 1) {
+      state "hit6name", label: '${currentValue}'
+    }
+    standardTile("hit6type", "device.hit6type", width: 1, height: 1) {
+      state "hit6type", label: '${currentValue}'
+    }
+    standardTile("hit6time", "device.hit6time", width: 2, height: 1) {
+      state "hit6time", label: '${currentValue}'
+    }
+    standardTile("hit7name", "device.hit7name", width: 3, height: 1) {
+      state "hit7name", label: '${currentValue}'
+    }
+    standardTile("hit7type", "device.hit7type", width: 1, height: 1) {
+      state "hit7type", label: '${currentValue}'
+    }
+    standardTile("hit7time", "device.hit7time", width: 2, height: 1) {
+      state "hit7time", label: '${currentValue}'
+    }
+    standardTile("hit8name", "device.hit8name", width: 3, height: 1) {
+      state "hit8name", label: '${currentValue}'
+    }
+    standardTile("hit8type", "device.hit8type", width: 1, height: 1) {
+      state "hit8type", label: '${currentValue}'
+    }
+    standardTile("hit8time", "device.hit8time", width: 2, height: 1) {
+      state "hit8time", label: '${currentValue}'
+    }
+    standardTile("hit9name", "device.hit9name", width: 3, height: 1) {
+      state "hit9name", label: '${currentValue}'
+    }
+    standardTile("hit9type", "device.hit9type", width: 1, height: 1) {
+      state "hit9type", label: '${currentValue}'
+    }
+    standardTile("hit9time", "device.hit9time", width: 2, height: 1) {
+      state "hit9time", label: '${currentValue}'
     }
   }
   
@@ -142,6 +214,24 @@ def clear() {
   sendEvent(name: "hit3name", value: "", displayed: false)
   sendEvent(name: "hit3type", value: "", displayed: false)
   sendEvent(name: "hit3time", value: "", displayed: false)
+  sendEvent(name: "hit4name", value: "", displayed: false)
+  sendEvent(name: "hit4type", value: "", displayed: false)
+  sendEvent(name: "hit4time", value: "", displayed: false)
+  sendEvent(name: "hit5name", value: "", displayed: false)
+  sendEvent(name: "hit5type", value: "", displayed: false)
+  sendEvent(name: "hit5time", value: "", displayed: false)
+  sendEvent(name: "hit6name", value: "", displayed: false)
+  sendEvent(name: "hit6type", value: "", displayed: false)
+  sendEvent(name: "hit6time", value: "", displayed: false)
+  sendEvent(name: "hit7name", value: "", displayed: false)
+  sendEvent(name: "hit7type", value: "", displayed: false)
+  sendEvent(name: "hit7time", value: "", displayed: false)
+  sendEvent(name: "hit8name", value: "", displayed: false)
+  sendEvent(name: "hit8type", value: "", displayed: false)
+  sendEvent(name: "hit8time", value: "", displayed: false)
+  sendEvent(name: "hit9name", value: "", displayed: false)
+  sendEvent(name: "hit9type", value: "", displayed: false)
+  sendEvent(name: "hit9time", value: "", displayed: false)
   // Clearing the events stored
   state.events = [:]
   // Clearing calculation buffers
@@ -175,13 +265,13 @@ def addEvent(theName, theType, theId) {
     state.events["0"].type = theType
     state.events["0"].time = now()
     // Reporting to tiles
-    for(int i=0; i<4; i++){
+    for(int i=0; i<10; i++){
       if(state.events["${i}"] != null){
         sendEvent(name: "hit${i}name", value: state.events["${i}"].get("id",   ""), displayed: false)
         sendEvent(name: "hit${i}type", value: state.events["${i}"].get("type", ""), displayed: false)
         sendEvent(name: "hit${i}time", value: state.events["${i}"].get("time", ""), displayed: false)
       } else {
-        i = 4;
+        i = 10;
       }
     }
     // Clearing getLastEventPosition buffer
