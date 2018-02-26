@@ -221,6 +221,7 @@ def off() {
   sendEvent(name: "alexaStatus", value: 0, displayed: false)
   sendEvent(name: "lastChange", value: 1, displayed: false)
   update()
+  clear()
 }
 def setLevel(level) {
   sendEvent(name: "alexaLevel", value: level, displayed: false)
@@ -253,6 +254,7 @@ def groupOff() {
   sendEvent(name: "groupStatus", value: 0, displayed: false)
   sendEvent(name: "lastChange", value: 11, displayed: false)
   update()
+  clear()
 }
 def groupSetLevel(level) {
   sendEvent(name: "groupLevel", value: level, displayed: false)
@@ -297,6 +299,7 @@ def appOff() {
   sendEvent(name: "appStatus", value: 0, displayed: false)
   sendEvent(name: "lastChange", value: 31, displayed: false)
   update()
+  clear()
 }
 def appSetLevel(level) {
   sendEvent(name: "appLevel", value: level, displayed: false)
