@@ -55,7 +55,7 @@ metadata {
     // Resets the state of the device to empty
     command "clear"
     // Stores a new event
-    command "addEvent", ["string", "string"]
+    command "addEvent", ["string", "string", "string"]
     // Events analysis
     // Reports the last ocurrence of an event from #1 of type #2 as timestamp
     command "getLastEventTime", ["string", "string"]
@@ -154,7 +154,7 @@ def clear() {
 }
 
 // Adding event to the log
-def addEvent(theName, theType) {
+def addEvent(theName, theType, theId) {
   // Checking mutex
   if (state.mutex001 == 1){
     runIn(1, "addEvent", ["theName": theName, "theType": theType])
@@ -171,12 +171,13 @@ def addEvent(theName, theType) {
     // Storing new event
     state.events["0"] = [:]
     state.events["0"].name = theName
+    state.events["0"].id   = theId
     state.events["0"].type = theType
     state.events["0"].time = now()
     // Reporting to tiles
     for(int i=0; i<4; i++){
       if(state.events["${i}"] != null){
-        sendEvent(name: "hit${i}name", value: state.events["${i}"].get("name", ""), displayed: false)
+        sendEvent(name: "hit${i}name", value: state.events["${i}"].get("id",   ""), displayed: false)
         sendEvent(name: "hit${i}type", value: state.events["${i}"].get("type", ""), displayed: false)
         sendEvent(name: "hit${i}time", value: state.events["${i}"].get("time", ""), displayed: false)
       } else {

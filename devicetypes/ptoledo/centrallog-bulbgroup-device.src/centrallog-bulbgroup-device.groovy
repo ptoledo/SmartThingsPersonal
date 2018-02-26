@@ -21,6 +21,7 @@ metadata {
     capability "Color Temperature"
     capability "Switch"
     capability "Switch Level"
+    capability "Refresh"
     
     // Attributes
     attribute "lastChange", "number"
@@ -62,10 +63,8 @@ metadata {
   tiles (scale: 2) {
     multiAttributeTile(name:"switch", type: "generic", width: 6, height: 4, canChangeIcon: true) {
       tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
-        attributeState "on", label:'${name}', action:"appOn", icon:"st.lights.multi-light-bulb-on", backgroundColor:"#00a0dc", nextState:"turningOff"
-        attributeState "off", label:'${name}', action:"appOff", icon:"st.lights.multi-light-bulb-off", backgroundColor:"#ffffff", nextState:"turningOn"
-        attributeState "turningOn", label:'${name}', action:"appOn", icon:"st.lights.multi-light-bulb-on", backgroundColor:"#00a0dc", nextState:"turningOff"
-        attributeState "turningOff", label:'${name}', action:"appOff", icon:"st.lights.multi-light-bulb-off", backgroundColor:"#ffffff", nextState:"turningOn"
+        attributeState "on", label:'${name}', action:"appOff", icon:"st.lights.multi-light-bulb-on", backgroundColor:"#00a0dc"
+        attributeState "off", label:'${name}', action:"appOn", icon:"st.lights.multi-light-bulb-off", backgroundColor:"#ffffff"
       }
       tileAttribute("device.settingController", key: "SECONDARY_CONTROL") {
         attributeState "settingController", label: 'Controller: ${currentValue}'
@@ -100,14 +99,18 @@ metadata {
     }
     standardTile("clearing", "device.settingController") {
       state "Alexa"    , label: "Taken by Alexa", backgroundColor: "#00a0dc", action: "clear"
-      state "App"      , label: "Clear"         , backgroundColor: "#ffffff"
-      state "Group"    , label: "Clear"         , backgroundColor: "#ffffff"
-      state "Inspector", label: "Clear"         , backgroundColor: "#ffffff"
+      state "App"      , label: "Clear"         , backgroundColor: "#ffffff", action: "clear"
+      state "Group"    , label: "Clear"         , backgroundColor: "#ffffff", action: "clear"
+      state "Inspector", label: "Clear"         , backgroundColor: "#ffffff", action: "clear"
     }
   }
   
   preferences {
-    input name: "bulbType", type: "enum", title: "enum", options: ["Color", "White"], description: "Set the tipe of bulbs to be controlled", required: true
+    input name: "bulbType", type: "enum",              title: "Bulb type", options: ["Color", "White"], description: "Set the tipe of bulbs to be controlled", required: true
+    input name: "bulb0",    type: "capability.switch", title: "Bulb 0", description: "Set the bulb 0 to control", required: false, multiple: false
+    input name: "bulb1",    type: "capability.switch", title: "Bulb 1", description: "Set the bulb 1 to control", required: false, multiple: false
+    input name: "bulb2",    type: "capability.switch", title: "Bulb 2", description: "Set the bulb 2 to control", required: false, multiple: false
+    input name: "bulb3",    type: "capability.switch", title: "Bulb 3", description: "Set the bulb 3 to control", required: false, multiple: false
   }
   
   simulator {
@@ -182,25 +185,29 @@ def update() {
   }
 
   // Processing change
+  def toSend = null
   if (toStatus != null) {
     if (toStatus == 0) {
-      sendEvent(name: "switch", value: "off")
+      toSend = [name: "switch", value: "off"]
     } else {
-      sendEvent(name: "switch", value: "on")
+      toSend = [name: "switch", value: "on"]
     }
   }
   if (toLevel != null) {
-    sendEvent(name: "level", value: toLevel)
+    toSend = [name: "level", value: toLevel]
   }
   if (toTemperature != null) {
-    sendEvent(name: "colorTemp", value: toTemperature)
+    toSend = [name: "colorTemp", value: toTemperature]
     sendEvent(name: "settingEnabled", value: "Temperature", displayed: false)
   }
   if (toColor != null) {
-    sendEvent(name: "color", value: toColor)
+    toSend = [name: "color", value: toColor]
     sendEvent(name: "settingEnabled", value: "Color", displayed: false)
     sendEvent(name: "hue", value: toColor.hue, displayed: false)
     sendEvent(name: "saturation", value: toColor.saturation, displayed: false)
+  }
+  if (toSend != null) {
+    refreshBulbs(toSend)
   }
 }
 
@@ -313,8 +320,27 @@ def appSetColor(huesaturation) {
 }
 
 // System calls
-def clear(){
+def clear() {
   sendEvent(name: "settingController", value: "Inspector", displayed: false)
+}
+private refreshBulbs(command) {
+  sendEvent(command)
+  if (bulb0 != null) {
+    //log.debug "Refresh Bulb0"
+    sendEvent(name: "refresh", value: command, data: [bulb: bulb0, name: command.name, value: command.value])
+  }
+  if (bulb1 != null) {
+    //log.debug "Refresh Bulb1"
+    sendEvent(name: "refresh", value: command, data: [bulb: bulb1, name: command.name, value: command.value])
+  }
+  if (bulb2 != null) {
+    //log.debug "Refresh Bulb2"
+    sendEvent(name: "refresh", value: command, data: [bulb: bulb2, name: command.name, value: command.value])
+  }
+  if (bulb3 != null) {
+    //log.debug "Refresh Bulb3"
+    sendEvent(name: "refresh", value: command, data: [bulb: bulb3, name: command.name, value: command.value])
+  }
 }
 
 // Unsupported commands
