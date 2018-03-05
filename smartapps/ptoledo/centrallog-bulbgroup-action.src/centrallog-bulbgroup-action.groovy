@@ -70,13 +70,16 @@ def getBulb(id){
   return runBulb
 }
 
-
 def refreshBulbs(evt) {
   def data = [name:  parseJson(evt.data).name, 
               bulb:  parseJson(evt.data).bulb, 
               coun:  0,
               check: false,
-              value: parseJson(evt.data).value]
+              value: parseJson(evt.data).value,
+              setti: parseJson(evt.data).setting,
+              tempe: parseJson(evt.data).colorTemp,
+              cohue: parseJson(evt.data).hue,
+              cosat: parseJson(evt.data).saturation]
   action(data)
 }
 
@@ -146,10 +149,30 @@ def mySwitch(data) {
   }
 }
 
+def mySetLevel(data) {
+  def bulb = getBulb(data.bulb)
+  log.debug "try ${data} (${bulb.displayName}) Current: ${bulb.currentValue("level")}"
+  if(bulb != null){
+    if(bulb.currentValue("switch") != "on" ) {
+      bulb.on()
+    }
+    if(bulb.currentValue("level") != data.value) {
+      bulb.setLevel(data.value)
+      data.check = false
+      runIn((data.coun/5)+2, "action", [data: data, overwrite: false])
+    } else if (data.check == false && bulb.currentValue("switch") == "on") {
+      addToCheck(data)
+    }
+  }
+}
+
 def mySetColor(data) {
   def bulb = getBulb(data.bulb)
   log.debug "try ${data} (${bulb.displayName}) Current: ${[hue: bulb.currentValue("hue"), saturation: bulb.currentValue("saturation")]}"
-  if(bulb != null && [hue: bulb.currentValue("hue"), saturation: bulb.currentValue("saturation")] != data.value && bulb.currentValue("switch") == "on") {
+  if(bulb.currentValue("switch") != "on" ) {
+    bulb.on()
+  }
+  if(bulb != null && [hue: bulb.currentValue("hue"), saturation: bulb.currentValue("saturation")]) {
     bulb.setColor(data.value)
     data.check = false
     runIn((data.coun/5)+2, "action", [data: data, overwrite: false]) 
@@ -161,22 +184,13 @@ def mySetColor(data) {
 def mySetColorTemperature(data) {
   def bulb = getBulb(data.bulb)
   log.debug "try ${data} (${bulb.displayName}) Current: ${bulb.currentValue("colorTemperature")}"
-  if(bulb != null && bulb.currentValue("colorTemperature") != data.value && bulb.currentValue("switch") == "on") {
+  if(bulb.currentValue("switch") != "on" ) {
+    bulb.on()
+  }
+  if(bulb != null && bulb.currentValue("colorTemperature") != data.value) {
     bulb.setColorTemperature(data.value)
     data.check = false
     runIn((data.coun/5)+2, "action", [data: data, overwrite: false]) 
-  } else if (data.check == false && bulb.currentValue("switch") == "on") {
-    addToCheck(data)
-  }
-}
-
-def mySetLevel(data) {
-  def bulb = getBulb(data.bulb)
-  log.debug "try ${data} (${bulb.displayName}) Current: ${bulb.currentValue("level")}"
-  if(bulb != null && bulb.currentValue("level") != data.value && bulb.currentValue("switch") == "on") {
-    bulb.setLevel(data.value)
-    data.check = false
-    runIn((data.coun/5)+2, "action", [data: data, overwrite: false])
   } else if (data.check == false && bulb.currentValue("switch") == "on") {
     addToCheck(data)
   }
