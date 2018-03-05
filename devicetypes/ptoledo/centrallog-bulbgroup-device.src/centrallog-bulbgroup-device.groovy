@@ -46,7 +46,7 @@ metadata {
     attribute "appLevel", "number"
     attribute "appTemperature", "number"
     // Enbled setting
-    attribute "settingEnabled", "string"
+    attribute "settingEnabled", "enum", ["Color", "Temperature"]
     attribute "settingController", "enum", ["Alexa", "Group", "Inspector", "App"]
     
     // Commands
@@ -330,19 +330,19 @@ private refreshBulbs(command) {
   sendEvent(command)
   if (bulb0 != null) {
     //log.debug "Refresh Bulb0"
-    sendEvent(name: "refresh", value: command, data: [bulb: bulb0, name: command.name, value: command.value])
+    sendEvent(name: "refresh", value: command, data: [bulb: bulb0, name: command.name, value: command.value, setting: device.currentValue("settingEnabled"), hue: device.currentValue("hue"), saturation: device.currentValue("saturation"), colorTemp: device.currentValue("colorTemp")])
   }
   if (bulb1 != null) {
     //log.debug "Refresh Bulb1"
-    sendEvent(name: "refresh", value: command, data: [bulb: bulb1, name: command.name, value: command.value])
+    sendEvent(name: "refresh", value: command, data: [bulb: bulb1, name: command.name, value: command.value, setting: device.currentValue("settingEnabled"), hue: device.currentValue("hue"), saturation: device.currentValue("saturation"), colorTemp: device.currentValue("colorTemp")])
   }
   if (bulb2 != null) {
     //log.debug "Refresh Bulb2"
-    sendEvent(name: "refresh", value: command, data: [bulb: bulb2, name: command.name, value: command.value])
+    sendEvent(name: "refresh", value: command, data: [bulb: bulb2, name: command.name, value: command.value, setting: device.currentValue("settingEnabled"), hue: device.currentValue("hue"), saturation: device.currentValue("saturation"), colorTemp: device.currentValue("colorTemp")])
   }
   if (bulb3 != null) {
     //log.debug "Refresh Bulb3"
-    sendEvent(name: "refresh", value: command, data: [bulb: bulb3, name: command.name, value: command.value])
+    sendEvent(name: "refresh", value: command, data: [bulb: bulb3, name: command.name, value: command.value, setting: device.currentValue("settingEnabled"), hue: device.currentValue("hue"), saturation: device.currentValue("saturation"), colorTemp: device.currentValue("colorTemp")])
   }
 }
 
